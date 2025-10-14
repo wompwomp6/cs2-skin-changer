@@ -10,23 +10,16 @@ namespace Offsets
     ///////////////////////////////////////////////////////////
 
     constexpr std::ptrdiff_t m_pWeaponServices = 0x1408; // CPlayer_WeaponServices*
-
-    constexpr std::ptrdiff_t m_hMyWeapons = 0x40; // C_NetworkUtlVectorBase<CHandle<C_BasePlayerWeapon>>
     constexpr std::ptrdiff_t m_hActiveWeapon = 0x58; // CHandle<C_BasePlayerWeapon>
 
-    constexpr std::ptrdiff_t m_pEntity = 0x10; // CEntityIdentity*
-    constexpr std::ptrdiff_t m_name = 0x18; // CUtlSymbolLarge
-
-    constexpr std::ptrdiff_t m_bNeedToReApplyGloves = 0x18BD; // bool
-    constexpr std::ptrdiff_t m_EconGloves = 0x18C0; // C_EconItemView
+    constexpr std::ptrdiff_t m_hHudModelArms = 0x243C; // CHandle<C_CS2HudModelArms>
+    constexpr std::ptrdiff_t m_hOwnerEntity = 0x520; // CHandle<C_BaseEntity>
 
     constexpr std::ptrdiff_t m_pGameSceneNode = 0x330; // CGameSceneNode*
     constexpr std::ptrdiff_t m_pChild = 0x40; // CGameSceneNode*
-    constexpr std::ptrdiff_t m_pParent = 0x38; // CGameSceneNode*
     constexpr std::ptrdiff_t m_pNextSibling = 0x48; // CGameSceneNode*
     constexpr std::ptrdiff_t m_pOwner = 0x30; // CEntityInstance*
-    constexpr std::ptrdiff_t m_hOwnerEntity = 0x520; // CHandle<C_BaseEntity>
-    constexpr std::ptrdiff_t m_hHudModelArms = 0x243C; // CHandle<C_CS2HudModelArms>
+
     constexpr std::ptrdiff_t m_modelState = 0x190; // CModelState
     constexpr std::ptrdiff_t m_MeshGroupMask = 0x250; // uint64
 
@@ -43,13 +36,5 @@ namespace Offsets
     constexpr std::ptrdiff_t m_iItemDefinitionIndex = 0x1BA; // uint16
     constexpr std::ptrdiff_t m_iItemIDHigh = 0x1D0; // uint32
     constexpr std::ptrdiff_t m_iAccountID = 0x1D8; // uint32
-    constexpr std::ptrdiff_t m_bInitialized = 0x1E8; // bool
     constexpr std::ptrdiff_t m_szCustomNameOverride = 0x3A1; // char[161]
-    constexpr std::ptrdiff_t m_AttributeList = 0x210; // CAttributeList
-    constexpr std::ptrdiff_t m_NetworkedDynamicAttributes = 0x288; // CAttributeList
-    constexpr std::ptrdiff_t m_Attributes = 0x8; // C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>
-
-    constexpr std::ptrdiff_t m_iAttributeDefinitionIndex = 0x30; // uint16
-    constexpr std::ptrdiff_t m_flValue = 0x34; // float32
-    constexpr std::ptrdiff_t m_flInitialValue = 0x38; // float32
 }

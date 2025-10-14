@@ -32,12 +32,13 @@ public:
     void SetMeshMask(uint64_t mask)
     {
         uintptr_t weaponNode = mem->Read<uintptr_t>(address + Offsets::m_pGameSceneNode);
+        std::cout << std::hex << mem->Read<uintptr_t>(weaponNode + 0x108) + 0x10 << std::endl;
 
-        CParamHandler* handler = new CParamHandler({
-                CParam(weaponNode, ArgumentType::Ptr),
-            });
-
-        wcl->CallFunction(Sigs::SetMeshMask, CallingConventions::FastCall, handler);
+        //CParamHandler* handler = new CParamHandler({
+        //        CParam(weaponNode, ArgumentType::Ptr),
+        //    });
+        //
+        //wcl->CallFunction(Sigs::SetMeshMask, CallingConventions::FastCall, handler);
     }
 
     CItemView* GetItem()

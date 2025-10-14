@@ -141,7 +141,6 @@
     <ClCompile Include="ext\ImGui 1.90\imgui_tables.cpp" />
     <ClCompile Include="ext\ImGui 1.90\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\ImGui 1.90\imconfig.h" />
@@ -157,20 +156,11 @@
     <ClInclude Include="ext\offsets.h" />
     <ClInclude Include="ext\sigs.h" />
     <ClInclude Include="ext\skindb.h" />
-    <ClInclude Include="ext\WCL.h" />
     <ClInclude Include="src\menu.h" />
+    <ClInclude Include="src\SDK\entity\arms.h" />
     <ClInclude Include="src\SDK\entity\econentity.h" />
     <ClInclude Include="src\SDK\entity\entity.h" />
-    <ClInclude Include="src\SDK\game.h" />
-    <ClInclude Include="src\SDK\entity\handle.h" />
-    <ClInclude Include="src\SDK\entity\hudModelArms.h" />
-    <ClInclude Include="src\SDK\item\itemAttribute.h" />
-    <ClInclude Include="src\SDK\item\itemview.h" />
-    <ClInclude Include="src\SDK\sdk.h" />
     <ClInclude Include="src\SDK\weapon\weapon.h" />
-    <ClInclude Include="src\SDK\weapon\weaponservice.h" />
-    <ClInclude Include="src\skin\CSkin.h" />
-    <ClInclude Include="src\window\globals.h" />
     <ClInclude Include="src\window\window.hpp" />
   </ItemGroup>
   <ItemGroup>

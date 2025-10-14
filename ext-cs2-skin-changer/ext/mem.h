@@ -214,7 +214,7 @@ public:
         }
     }
 
-    uintptr_t Allocate(size_t size, uintptr_t address = NULL, DWORD protection = PAGE_EXECUTE_READWRITE) const {
+    uintptr_t Allocate(uintptr_t address = NULL, size_t size = NULL, DWORD protection = PAGE_EXECUTE_READWRITE) const {
         LPVOID addr = VirtualAllocEx(
             hProcess,            
             reinterpret_cast<LPVOID>(address),

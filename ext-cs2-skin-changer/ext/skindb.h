@@ -15,17 +15,52 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* use
 }
 
 struct SkinInfo {
-    int Paint;                // paint_index
+    int Paint;  
     std::string name;
-    bool bUsesOldModel;       // legacy_model
+    bool bUsesOldModel; 
     WeaponsEnum weaponType;
 };
 
+class VInv
+{
+private:
+    std::vector<SkinInfo>* skins = new std::vector<SkinInfo>();
+public:
+    void AddSkin(SkinInfo& Skin)
+    {
+        for (auto& skin : *skins)
+        {
+            if (skin.weaponType == Skin.weaponType)
+            {
+                skin = Skin;
+                return;
+            }     
+        }
+
+        skins->push_back(Skin);
+    }
+
+    SkinInfo GetSkin(WeaponsEnum def)
+    {
+        if (!skins->empty())
+            return SkinInfo();
+
+        for (const auto& skin : *skins)
+        {
+            if (skin.weaponType == def)
+                return skin;
+        }
+
+        return SkinInfo();
+    }
+};
+VInv* vInv = new VInv();
+
 class CSkinDB {
 private:
-    std::vector<SkinInfo> knifeSkins;
-    std::vector<SkinInfo> gloveSkins;
-    std::vector<SkinInfo> weaponSkins;
+    std::vector<SkinInfo>* knifeSkins = new std::vector<SkinInfo>();
+    std::vector<SkinInfo>* gloveSkins = new std::vector<SkinInfo>();
+    std::vector<SkinInfo>* weaponSkins = new std::vector<SkinInfo>();
 
     std::string GetStringSafe(const nlohmann::json& j, const std::string& key) {
         if (!j.contains(key)) return "";
@@ -159,15 +194,15 @@ public:
 
                 if (isKnife)
                 {
-                    knifeSkins.push_back(info);
+                    knifeSkins->push_back(info);
                     continue;
                 }
                 if (isGlove)
                 {
-                    gloveSkins.push_back(info);
+                    gloveSkins->push_back(info);
                     continue;
                 }
-                weaponSkins.push_back(info);     
+                weaponSkins->push_back(info);     
             }
         }
         catch (const std::exception& e) {
@@ -179,12 +214,9 @@ public:
     {
         std::vector<SkinInfo> results;
 
-        for (auto& skin : weaponSkins)
+        for (const auto& skin : *weaponSkins)
         {
             if (type != WeaponsEnum::none && skin.weaponType != type)
-                continue;
-
-            if (skin.bUsesOldModel)
                 continue;
 
             results.push_back(skin);
@@ -192,6 +224,5 @@ public:
 
         return results;
     }
-
 };
 CSkinDB* skindb = new CSkinDB();

@@ -39,9 +39,6 @@
     <ClCompile Include="ext\ImGui 1.90\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\window\window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\mem.h">
@@ -83,18 +80,6 @@
     <ClInclude Include="ext\offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\window\globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SDK\entity\entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SDK\game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SDK\sdk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SDK\weapon\weapon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -104,28 +89,13 @@
     <ClInclude Include="src\SDK\entity\econentity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SDK\item\itemview.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SDK\weapon\weaponservice.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SDK\entity\handle.h">
+    <ClInclude Include="src\SDK\entity\entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SDK\item\itemAttribute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SDK\entity\hudModelArms.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ext\WCL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\skin\CSkin.h">
+    <ClInclude Include="src\SDK\entity\arms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

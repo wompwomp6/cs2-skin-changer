@@ -1,74 +1,81 @@
-#include "skin/CSkin.h"
+#include "SDK/weapon/weapon.h"
 #include "../ext/skindb.h"
 
-namespace Globals
+#include "window/window.hpp"
+
+void RenderWeapons(const WeaponsEnum& CurrentType)
 {
-	static bool AllowAllSkins = false;
+    std::vector<SkinInfo> skins = skindb->GetWeapons(CurrentType);
+
+    static char search_buffer[64] = "";
+    static std::vector<int> filtered_indices;
+
+    static int SelectedSkinIndex = -1;
+
+    SkinInfo currentSkin = vInv->GetSkin(CurrentType);
+
+    if (SelectedSkinIndex == -1 && currentSkin.Paint != 0)
+    {
+        for (int i = 0; i < skins.size(); i++)
+        {
+            if (skins[i].Paint == currentSkin.Paint)
+            {
+                SelectedSkinIndex = i;
+                break;
+            }
+        }
+    }
+
+    ImGui::InputText("Search", search_buffer, IM_ARRAYSIZE(search_buffer));
+    ImGui::BeginChild("SkinsList", ImVec2(0, 300), true, ImGuiWindowFlags_HorizontalScrollbar);
+
+    filtered_indices.clear();
+
+    for (int i = 0; i < skins.size(); i++)
+    {
+        std::string name = skins[i].name;
+        std::string query = search_buffer;
+
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+
+        if (query.empty() || name.find(query) != std::string::npos)
+            filtered_indices.push_back(i);
+    }
+
+    for (int idx : filtered_indices)
+    {
+        bool is_selected = (SelectedSkinIndex == idx);
+        if (ImGui::Selectable(skins[idx].name.c_str(), is_selected))
+        {
+            SelectedSkinIndex = idx;
+
+            SkinInfo newSkin;
+            newSkin.Paint = skins[idx].Paint;
+            newSkin.name = skins[idx].name;
+            newSkin.bUsesOldModel = skins[idx].bUsesOldModel;
+            newSkin.weaponType = CurrentType;
+
+            vInv->AddSkin(newSkin);
+        }
+
+        if (is_selected)
+            ImGui::SetItemDefaultFocus();
+    }
+
+    ImGui::EndChild();
 }
 
-void RenderWeapons()
+
+bool MenuOpen = true;
+void RenderMenu(const WeaponsEnum& def)
 {
-	WeaponsEnum WantedWeapon = WeaponsEnum::none;
-	WeaponsEnum CurrentType = game->GetLocalPlayer()->GetWeaponService()->GetActiveWeapon()->GetItem()->GetItemDefinition();
+	if (GetAsyncKeyState(VK_INSERT) & 1)
+		MenuOpen = !MenuOpen;
 
-	if (!Globals::AllowAllSkins)
-		WantedWeapon = CurrentType;
+	if (!MenuOpen)
+		return;
 
-	std::vector<SkinInfo> skins = skindb->GetWeapons(WantedWeapon);
-	int32_t WeantedSkinIndex = 0;
-	static char search_buffer[64] = "";
-	static std::vector<int> filtered_indices;
-
-	SkinInfo* currentskin = cskin->GetCurrentAddedSkin();
-
-	if (currentskin && currentskin->Paint)
-		for (int i = 0; i < skins.size(); i++)
-			if (skins[i].Paint == currentskin->Paint)
-				WeantedSkinIndex = i;
-
-	ImGui::InputText("Search", search_buffer, IM_ARRAYSIZE(search_buffer));
-	ImGui::BeginChild("SkinsList", ImVec2(0, 300), true, ImGuiWindowFlags_HorizontalScrollbar);
-
-	filtered_indices.clear();
-
-	for (int i = 0; i < skins.size(); i++)
-	{
-		std::string name = skins[i].name;
-		std::string query = search_buffer;
-
-		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-		std::transform(query.begin(), query.end(), query.begin(), ::tolower);
-
-		if (query.empty() || name.find(query) != std::string::npos)
-			filtered_indices.push_back(i);
-	}
-
-	for (int idx : filtered_indices)
-	{
-		bool is_selected = (WeantedSkinIndex == idx);
-		if (ImGui::Selectable(skins[idx].name.c_str(), is_selected))
-			WeantedSkinIndex = idx;
-
-		if (is_selected)
-			ImGui::SetItemDefaultFocus();
-	}
-
-	if (!filtered_indices.empty() && WeantedSkinIndex >= 0 && WeantedSkinIndex < filtered_indices.size())
-	{
-		auto& selectedSkin = skins[filtered_indices[WeantedSkinIndex]];
-		cskin->AddSkin(new SkinInfo(
-			selectedSkin.Paint,
-			selectedSkin.name,
-			selectedSkin.bUsesOldModel,
-			CurrentType
-		));
-	}
-
-	ImGui::EndChild();
-}
-
-void RenderMenu()
-{
 	ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
 	ImGui::Begin("CS2 Skin Changer", nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize);
 
@@ -93,7 +100,7 @@ void RenderMenu()
 		switch (active_tab)
 		{
 		case 0: // Weapon
-			RenderWeapons();
+			RenderWeapons(def);
 			break;
 		case 1: // Gloves
 			ImGui::Text("Gloves tab content here");
@@ -105,7 +112,7 @@ void RenderMenu()
 			ImGui::Text("Agents tab content here");
 			break;
 		case 4: // Misc
-			ImGui::Checkbox("Allow All Skins", &Globals::AllowAllSkins);
+            ImGui::Text("Misc tab content here");
 			break;
 		}
 	}
