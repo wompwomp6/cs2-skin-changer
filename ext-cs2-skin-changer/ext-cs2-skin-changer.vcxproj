@@ -158,7 +158,6 @@
     <ClInclude Include="ext\skindb.h" />
     <ClInclude Include="src\menu.h" />
     <ClInclude Include="src\SDK\entity\arms.h" />
-    <ClInclude Include="src\SDK\entity\econentity.h" />
     <ClInclude Include="src\SDK\entity\entity.h" />
     <ClInclude Include="src\SDK\weapon\weapon.h" />
     <ClInclude Include="src\window\window.hpp" />

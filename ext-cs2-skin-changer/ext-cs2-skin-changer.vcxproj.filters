@@ -86,9 +86,6 @@
     <ClInclude Include="ext\sigs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SDK\entity\econentity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\SDK\entity\entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>

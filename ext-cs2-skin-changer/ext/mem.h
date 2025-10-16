@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <cstdint>
+#include <vector>
 
 class Memory {
 private:

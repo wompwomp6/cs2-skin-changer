@@ -1,3 +1,6 @@
+#include "../../../ext/sigs.h"
+#include "../../../ext/offsets.h"
+
 #pragma once
 
 enum ItemIds
@@ -5,7 +8,6 @@ enum ItemIds
     NoSkinValues = 0,
     UseFallBackValues = -1,
 };
-
 enum WeaponsEnum
 {
 	none = 0,
@@ -52,3 +54,36 @@ enum WeaponsEnum
     Revolver = 64,
     //Tknife = 59
 };
+
+void UpdateSkin()
+{
+    if (Sigs::SwitchHands)
+    {
+        mem->CallThread(Sigs::SwitchHands);
+        Sleep(10);
+        mem->CallThread(Sigs::SwitchHands);
+    }
+
+    Sleep(50);
+
+    if (Sigs::RegenerateWeaponSkins)
+    {
+        mem->CallThread(Sigs::RegenerateWeaponSkins);
+    }
+}
+
+void SetMeshMask(const uintptr_t ent, const uint64_t mask)
+{
+    const auto& node = mem->Read<uintptr_t>(ent + Offsets::m_pGameSceneNode);
+    const auto model = node + Offsets::m_modelState;
+    const auto dirtyAttributes = mem->Read<uintptr_t>(model + 0x108);
+
+    if (model + Offsets::m_MeshGroupMask == mask)
+        return;
+
+    for (int i = 0; i < 1000; i++)
+    {
+        mem->Write<uint64_t>(model + Offsets::m_MeshGroupMask, mask);
+    }
+    mem->Write<uint64_t>(dirtyAttributes + 0x10, mask);
+}

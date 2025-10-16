@@ -4,15 +4,14 @@
 
 namespace Offsets
 {
-    constexpr std::ptrdiff_t dwEntityList = 0x1D16758;
-    constexpr std::ptrdiff_t dwLocalPlayerPawn = 0x1BF1FA0;
+    constexpr std::ptrdiff_t dwEntityList = 0x1D00690;
+    constexpr std::ptrdiff_t dwLocalPlayerPawn = 0x1BDBB10;
 
     ///////////////////////////////////////////////////////////
 
-    constexpr std::ptrdiff_t m_pWeaponServices = 0x1408; // CPlayer_WeaponServices*
-    constexpr std::ptrdiff_t m_hActiveWeapon = 0x58; // CHandle<C_BasePlayerWeapon>
+    constexpr std::ptrdiff_t m_pClippingWeapon = 0x3DE0; // C_CSWeaponBase*
 
-    constexpr std::ptrdiff_t m_hHudModelArms = 0x243C; // CHandle<C_CS2HudModelArms>
+    constexpr std::ptrdiff_t m_hHudModelArms = 0x2420; // CHandle<C_CS2HudModelArms>
     constexpr std::ptrdiff_t m_hOwnerEntity = 0x520; // CHandle<C_BaseEntity>
 
     constexpr std::ptrdiff_t m_pGameSceneNode = 0x330; // CGameSceneNode*
@@ -23,14 +22,14 @@ namespace Offsets
     constexpr std::ptrdiff_t m_modelState = 0x190; // CModelState
     constexpr std::ptrdiff_t m_MeshGroupMask = 0x250; // uint64
 
-    constexpr std::ptrdiff_t m_nFallbackPaintKit = 0x1888; // int32
-    constexpr std::ptrdiff_t m_nFallbackSeed = 0x188C; // int32
-    constexpr std::ptrdiff_t m_flFallbackWear = 0x1890; // float32
-    constexpr std::ptrdiff_t m_nFallbackStatTrak = 0x1894; // int32
+    constexpr std::ptrdiff_t m_nFallbackPaintKit = 0x1870; // int32
+    constexpr std::ptrdiff_t m_nFallbackSeed = 0x1874; // int32
+    constexpr std::ptrdiff_t m_flFallbackWear = 0x1878; // float32
+    constexpr std::ptrdiff_t m_nFallbackStatTrak = 0x187C; // int32
 
-    constexpr std::ptrdiff_t m_OriginalOwnerXuidLow = 0x1880; // uint32
+    constexpr std::ptrdiff_t m_OriginalOwnerXuidLow = 0x1868; // uint32
 
-    constexpr std::ptrdiff_t m_AttributeManager = 0x13A8; // C_AttributeContainer
+    constexpr std::ptrdiff_t m_AttributeManager = 0x1390; // C_AttributeContainer
     constexpr std::ptrdiff_t m_Item = 0x50; // C_EconItemView
 
     constexpr std::ptrdiff_t m_iItemDefinitionIndex = 0x1BA; // uint16

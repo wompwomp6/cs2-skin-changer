@@ -7,34 +7,12 @@
 #include "SDK/entity/entity.h"
 #include "SDK/entity/arms.h"
 
-void UpdateSkin()
+void Patches()
 {
-    if (Sigs::SwitchHands)
-    {
-        mem->CallThread(Sigs::SwitchHands);
-        Sleep(50);
-        mem->CallThread(Sigs::SwitchHands);
-    }
-
-    Sleep(50);
-
-    if (Sigs::RegenerateWeaponSkins)
-    {
-        mem->CallThread(Sigs::RegenerateWeaponSkins);
-    }
-}
-
-void SetMeshMask(const uintptr_t ent, const uint64_t mask)
-{
-    const auto& node = mem->Read<uintptr_t>(ent + Offsets::m_pGameSceneNode);
-    const auto model = node + Offsets::m_modelState;
-    const auto dirtyAttributes = mem->Read<uintptr_t>(model + 0x108);
-
-    for (int i = 0; i < 1000; i++)
-    {
-        mem->Write<uint64_t>(model + Offsets::m_MeshGroupMask, mask);
-        mem->Write<uint64_t>(dirtyAttributes + 0x10, mask);
-    }
+    if (Sigs::SetFallBackDataPatch)
+        mem->Patch(Sigs::SetFallBackDataPatch, 3);
+    if(Sigs::RegenerateWeaponSkins)
+        mem->Patch(Sigs::SetFallBackDataPatch + 0x50, 7);
 }
 
 int main()
@@ -44,48 +22,55 @@ int main()
     //overlay::SetupWindow(L"cs2 ext skin changer", L"cs2_overlay");
     //overlay::CreateDeviceD3D(overlay::Window);
  
-    if (Sigs::SetFallBackDataPatch)
-        mem->Patch(Sigs::SetFallBackDataPatch, 3);
+    Patches();
 
     std::cout << "[SkinChanger] Loaded Press Insert For Menu\n";
     Beep(400, 500);
 
     const auto client = mem->GetModuleBase(L"client.dll");
+    
     while (true)
     {
         Sleep(10);
 
         const auto localPlayer = mem->Read<uintptr_t>(client + Offsets::dwLocalPlayerPawn);
-        const auto& weaponServices = mem->Read<uintptr_t>(localPlayer + Offsets::m_pWeaponServices);
-        const auto weapon = GetEntityByHandle(mem->Read<uintptr_t>(weaponServices + Offsets::m_hActiveWeapon));
+        const auto weapon = mem->Read<uintptr_t>(localPlayer + Offsets::m_pClippingWeapon);
         const auto item = weapon + Offsets::m_AttributeManager + Offsets::m_Item;
         const auto weaponDef = static_cast<WeaponsEnum>(mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex));
-        if (!weapon)
+        if (!weapon || !item || !weaponDef)
             continue;
 
         //overlay::Render();
         //RenderMenu(weaponDef);
         //overlay::EndRender();
 
+        //std::cout << std::hex << item + 0x210 << std::endl;
+        std::cout << std::hex << weapon << std::endl;
+        if (!GetAsyncKeyState(VK_HOME))
+            continue;
+        
         //const SkinInfo& ActiveSkin = vInv->GetSkin(weaponDef);
-        const SkinInfo ActiveSkin = SkinInfo(653, "usp", true, none);
+        //const SkinInfo ActiveSkin = SkinInfo(653, "usp", true, UspS);
+        //const SkinInfo ActiveSkin = SkinInfo(796, "usp", false, UspS);
+        //const SkinInfo ActiveSkin = SkinInfo(344, "", true, Awp);
+        const SkinInfo ActiveSkin = SkinInfo(917, "", false, Awp);
 
         //std::cout << ActiveSkin.Paint << std::endl;
+        if (weaponDef != ActiveSkin.weaponType)
+            continue;
 
-
-
-        //if (mem->Read<uint32_t>(weapon + Offsets::m_nFallbackPaintKit) != ActiveSkin.Paint)
-        //{
-        //    SetMeshMask(weapon, 1 + ActiveSkin.bUsesOldModel);
-        //    SetMeshMask(GetHudWeapon(localPlayer, weapon), 1 + ActiveSkin.bUsesOldModel);
-        //
-        //    mem->Write<uint32_t>(item + Offsets::m_iAccountID, mem->Read<uint32_t>(weapon + Offsets::m_OriginalOwnerXuidLow));
-        //    mem->Write<ItemIds>(item + Offsets::m_iItemIDHigh, ItemIds::UseFallBackValues);
-        //    mem->Write<int32_t>(weapon + Offsets::m_nFallbackPaintKit, ActiveSkin.Paint);
-        //
-        //    Sleep(300);
-        //
-        //    UpdateSkin();
-        //}
+        if (mem->Read<uint32_t>(weapon + Offsets::m_nFallbackPaintKit) != ActiveSkin.Paint)
+        {
+            SetMeshMask(weapon, 1 + ActiveSkin.bUsesOldModel);
+            SetMeshMask(GetHudWeapon(localPlayer, weapon), 1 + ActiveSkin.bUsesOldModel);
+            
+            mem->Write<uint32_t>(item + Offsets::m_iAccountID, mem->Read<uint32_t>(weapon + Offsets::m_OriginalOwnerXuidLow));
+            mem->Write<ItemIds>(item + Offsets::m_iItemIDHigh, ItemIds::UseFallBackValues);
+            mem->Write<int32_t>(weapon + Offsets::m_nFallbackPaintKit, ActiveSkin.Paint);
+            
+            Sleep(300);
+            
+            UpdateSkin();
+        }
     }  
 }
