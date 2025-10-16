@@ -105,6 +105,14 @@ public:
         WriteProcessMemory(hProcess, reinterpret_cast<LPVOID>(address), &value, sizeof(T), nullptr);
     }
 
+    void WriteString(uintptr_t pAddress, std::string string)
+    {
+        for (int i = 0; i< string.size(); i++)
+        {
+            Write<char>(pAddress + i, string[i]);
+        }
+    }
+
     // Module base address getter
     uintptr_t GetModuleBase(const std::wstring& moduleName) const {
         uintptr_t base = 0;
@@ -201,6 +209,9 @@ public:
 
     void Patch(uintptr_t address, int size)
     {
+        if (!address)
+            return;
+
         for (int i = 0; i < size; i++)
         {
             Write<uint8_t>(address + i, 0x90);
@@ -213,6 +224,27 @@ public:
         {
             Write<uint8_t>(address + i, bytes[i]);
         }
+    }
+
+    std::vector<uint8_t> ReadBytes(uintptr_t address, int size)
+    {
+        std::vector<uint8_t> bytes;
+        for (int i = 0; i < size; i++)
+        {
+            bytes.push_back(Read<uint8_t>(address + i));
+        }
+        return bytes;
+    }
+
+    void SwapPatch(uintptr_t address, int bytesSize, int delay = 0)
+    {
+        if (!address)
+            return;
+
+        std::vector<uint8_t> ogBytes = ReadBytes(address, bytesSize);
+        Patch(address, bytesSize);
+        Sleep(delay);
+        WriteBytes(address, ogBytes);
     }
 
     uintptr_t Allocate(uintptr_t address = NULL, size_t size = NULL, DWORD protection = PAGE_EXECUTE_READWRITE) const {
@@ -242,6 +274,9 @@ public:
     
     void CallThread(uintptr_t funcAddress, LPVOID arg = nullptr)
     {
+        if (!funcAddress)
+            return;
+
         HANDLE hThread = CreateThread(funcAddress, arg);
         if (hThread) {
             WaitForSingleObject(hThread, INFINITE);

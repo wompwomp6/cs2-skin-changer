@@ -10,7 +10,7 @@ enum ItemIds
 };
 enum WeaponsEnum
 {
-	none = 0,
+    none = 0,
     Deagle = 1,
     Elite = 2,
     FiveSeven = 3,
@@ -39,7 +39,7 @@ enum WeaponsEnum
     Scar20 = 38,
     Sg556 = 39,
     Ssg08 = 40,
-    //CtKnife = 42,
+    CtKnife = 42,
     FlashBang = 43,
     HeGrenade = 44,
     SmokeGrenade = 45,
@@ -52,24 +52,73 @@ enum WeaponsEnum
     M4A1Silencer = 60,
     Cz65A = 63,
     Revolver = 64,
-    //Tknife = 59
+    Tknife = 59,
+    Galil = 13,
+    Mp5SD = 23
 };
+
+std::string WeaponIdToString(int weaponId)
+{
+    switch (weaponId)
+    {
+    case 0: return "None";
+    case 1: return "Deagle";
+    case 2: return "Dual";
+    case 3: return "FiveSeven";
+    case 4: return "Glock";
+    case 7: return "Ak47";
+    case 8: return "Aug";
+    case 9: return "Awp";
+    case 10: return "Famas";
+    case 11: return "G3Sg1";
+    case 14: return "M249";
+    case 17: return "Mac10";
+    case 19: return "P90";
+    case 24: return "Ump45";
+    case 25: return "Xm1014";
+    case 26: return "Bizon";
+    case 27: return "Mag7";
+    case 28: return "Negev";
+    case 29: return "Sawedoff";
+    case 30: return "Tec9";
+    case 31: return "Zeus";
+    case 32: return "P200";
+    case 33: return "Mp7";
+    case 34: return "Mp9";
+    case 35: return "Nova";
+    case 36: return "p250";
+    case 38: return "Scar20";
+    case 39: return "Sg556";
+    case 40: return "Ssg08";
+    case 43: return "FlashBang";
+    case 44: return "HeGrenade";
+    case 45: return "SmokeGrenade";
+    case 46: return "Molotov";
+    case 47: return "Decoy";
+    case 48: return "IncGrenade";
+    case 49: return "C4";
+    case 16: return "M4A4";
+    case 61: return "Usp";
+    case 60: return "M4A1-S";
+    case 63: return "Cz";
+    case 64: return "R8";
+    case 13: return "Galil";
+    case 23: return "MP5 SD";
+    default: return "None";
+    }
+}
 
 void UpdateSkin()
 {
-    if (Sigs::SwitchHands)
-    {
-        mem->CallThread(Sigs::SwitchHands);
-        Sleep(10);
-        mem->CallThread(Sigs::SwitchHands);
-    }
+    mem->CallThread(Sigs::SwitchHands);
+    Sleep(10);
+    mem->CallThread(Sigs::SwitchHands);
 
     Sleep(50);
 
-    if (Sigs::RegenerateWeaponSkins)
-    {
-        mem->CallThread(Sigs::RegenerateWeaponSkins);
-    }
+    mem->CallThread(Sigs::RegenerateWeaponSkins);
+    
+    mem->SwapPatch(Sigs::ForceUpdateHud, 2, 250);
 }
 
 void SetMeshMask(const uintptr_t ent, const uint64_t mask)

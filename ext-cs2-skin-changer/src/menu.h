@@ -66,6 +66,11 @@ void RenderWeapons(const WeaponsEnum& CurrentType)
     ImGui::EndChild();
 }
 
+void RenderAddedSkins()
+{
+
+}
+
 
 bool MenuOpen = true;
 void RenderMenu(const WeaponsEnum& def)
@@ -84,10 +89,8 @@ void RenderMenu(const WeaponsEnum& def)
 
 	ImGui::BeginChild("Sidebar", ImVec2(120, 0), true);
 	{
-		if (ImGui::Button("Weapon", ImVec2(100, 30))) active_tab = 0;
-		if (ImGui::Button("Gloves", ImVec2(100, 30))) active_tab = 1;
-		if (ImGui::Button("Knife", ImVec2(100, 30))) active_tab = 2;
-		if (ImGui::Button("Agents", ImVec2(100, 30))) active_tab = 3;
+		if (ImGui::Button("Skins", ImVec2(100, 30))) active_tab = 0;
+		if (ImGui::Button("AddedSkins", ImVec2(100, 30))) active_tab = 1;
 		if (ImGui::Button("Misc", ImVec2(100, 30))) active_tab = 4;
 	}
 	ImGui::EndChild();
@@ -99,20 +102,11 @@ void RenderMenu(const WeaponsEnum& def)
 	{
 		switch (active_tab)
 		{
-		case 0: // Weapon
-			RenderWeapons(def);
+		case 0:
 			break;
-		case 1: // Gloves
-			ImGui::Text("Gloves tab content here");
+		case 1:
 			break;
-		case 2: // Knife
-			ImGui::Text("Knife tab content here");
-			break;
-		case 3: // Agents
-			ImGui::Text("Agents tab content here");
-			break;
-		case 4: // Misc
-            ImGui::Text("Misc tab content here");
+		case 2:
 			break;
 		}
 	}

@@ -95,6 +95,12 @@
     <ClInclude Include="src\SDK\entity\arms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ext\a2x\client_dll.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\a2x\offsets.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

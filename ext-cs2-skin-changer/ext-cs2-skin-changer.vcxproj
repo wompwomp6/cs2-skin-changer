@@ -143,6 +143,8 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ext\a2x\client_dll.hpp" />
+    <ClInclude Include="ext\a2x\offsets.hpp" />
     <ClInclude Include="ext\ImGui 1.90\imconfig.h" />
     <ClInclude Include="ext\ImGui 1.90\imgui.h" />
     <ClInclude Include="ext\ImGui 1.90\imgui_impl_dx11.h" />
