@@ -8,5 +8,5 @@ uintptr_t GetEntityByHandle(const auto& handle)
 
     const auto listentry = mem->Read<uintptr_t>(entitylist + 0x8 * ((handle & 0x7FFF) >> 9) + 0x10);
 
-    return mem->Read<uintptr_t>(listentry + 0x78 * (handle & 0x1FF));
+    return mem->Read<uintptr_t>(listentry + 0x70 * (handle & 0x1FF));
 }

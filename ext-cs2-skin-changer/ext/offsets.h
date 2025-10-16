@@ -29,7 +29,7 @@ namespace Offsets
 
     constexpr std::ptrdiff_t m_OriginalOwnerXuidLow = 0x1868; // uint32
 
-    constexpr std::ptrdiff_t m_AttributeManager = 0x1390; // C_AttributeContainer
+    constexpr std::ptrdiff_t m_AttributeManager = 0x1438; // C_AttributeContainer
     constexpr std::ptrdiff_t m_Item = 0x50; // C_EconItemView
 
     constexpr std::ptrdiff_t m_iItemDefinitionIndex = 0x1BA; // uint16

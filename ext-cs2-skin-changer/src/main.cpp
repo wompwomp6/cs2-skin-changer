@@ -11,8 +11,8 @@ void Patches()
 {
     if (Sigs::SetFallBackDataPatch)
         mem->Patch(Sigs::SetFallBackDataPatch, 3);
-    if(Sigs::RegenerateWeaponSkins)
-        mem->Patch(Sigs::SetFallBackDataPatch + 0x50, 7);
+    if(Sigs::RegenerateWeaponSkinsPatch)
+        mem->Patch(Sigs::RegenerateWeaponSkinsPatch, 7);
 }
 
 int main()
@@ -37,6 +37,7 @@ int main()
         const auto weapon = mem->Read<uintptr_t>(localPlayer + Offsets::m_pClippingWeapon);
         const auto item = weapon + Offsets::m_AttributeManager + Offsets::m_Item;
         const auto weaponDef = static_cast<WeaponsEnum>(mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex));
+        std::cout << std::hex << weapon << std::endl;
         if (!weapon || !item || !weaponDef)
             continue;
 
@@ -45,15 +46,15 @@ int main()
         //overlay::EndRender();
 
         //std::cout << std::hex << item + 0x210 << std::endl;
-        std::cout << std::hex << weapon << std::endl;
+        std::cout << std::hex << GetHudWeapon(localPlayer, weapon) << std::endl;
         if (!GetAsyncKeyState(VK_HOME))
             continue;
         
         //const SkinInfo& ActiveSkin = vInv->GetSkin(weaponDef);
         //const SkinInfo ActiveSkin = SkinInfo(653, "usp", true, UspS);
         //const SkinInfo ActiveSkin = SkinInfo(796, "usp", false, UspS);
-        //const SkinInfo ActiveSkin = SkinInfo(344, "", true, Awp);
-        const SkinInfo ActiveSkin = SkinInfo(917, "", false, Awp);
+        const SkinInfo ActiveSkin = SkinInfo(344, "", true, Awp);
+        //const SkinInfo ActiveSkin = SkinInfo(917, "", false, Awp);
 
         //std::cout << ActiveSkin.Paint << std::endl;
         if (weaponDef != ActiveSkin.weaponType)
