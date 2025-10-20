@@ -4,8 +4,8 @@
 #include "../ext/offsets.h"
 #include "../ext/sigs.h"
 
-#include "SDK/entity/entity.h"
-#include "SDK/entity/arms.h"
+#include "SDK/entity/dwEntityListManager.h"
+#include "SDK/entity/C_CS2HudModelArms.h"
 
 void Patches()
 {
@@ -15,6 +15,9 @@ void Patches()
 
 int main()
 {
+    std::cout << std::hex << mem->Read<uintptr_t>(mem->Read<uintptr_t>(mem->GetModuleBase(L"client.dll") + Offsets::dwLocalPlayerPawn) + Offsets::m_pClippingWeapon) << std::endl;
+    //std::cout << std::hex << Sigs::CEconItemAttributeVtable << std::endl;
+    return 0;
     //skindb->Dump();
 
     //overlay::SetupWindow(L"cs2 ext skin changer", L"cs2_overlay");

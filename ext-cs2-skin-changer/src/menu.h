@@ -1,4 +1,4 @@
-#include "SDK/weapon/weapon.h"
+#include "SDK/weapon/C_EconEntity.h"
 #include "../ext/skindb.h"
 
 #include "window/window.hpp"

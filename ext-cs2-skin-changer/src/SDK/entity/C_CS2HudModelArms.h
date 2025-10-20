@@ -1,4 +1,4 @@
-#include "entity.h"
+#include "dwEntityListManager.h"
 #include "../../../ext/offsets.h"
 
 #pragma once

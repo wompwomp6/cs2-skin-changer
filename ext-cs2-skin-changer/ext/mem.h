@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <vector>
 
+#define MemPage 0xFFF//4095 bytes
+
 class Memory {
 private:
 public:
@@ -245,6 +247,12 @@ public:
         Patch(address, bytesSize);
         Sleep(delay);
         WriteBytes(address, ogBytes);
+    }
+
+    inline uintptr_t ResolveRelativeAddress(uintptr_t instruction, int offsetOffset = 3, int instructionSize = 7)
+    {
+        int32_t relativeOffset = Read<int32_t>(instruction + offsetOffset);
+        return instruction + instructionSize + relativeOffset;
     }
 
     uintptr_t Allocate(uintptr_t address = NULL, size_t size = NULL, DWORD protection = PAGE_EXECUTE_READWRITE) const {

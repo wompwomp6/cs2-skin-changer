@@ -13,4 +13,6 @@ namespace Sigs
 
 	const auto RegenerateWeaponSkinsPatch = mem->SigScan(L"client.dll", "83 BB ? ? ? ? ? 7F ? 83 BB ? ? ? ? ? 7E ? 48 8D 8B ? ? ? ? B2 ? E8 ? ? ? ? 33 D2");
 	const auto SetFallBackDataPatch = mem->SigScan(L"client.dll", "F6 C3 ? 0F 84 ? ? ? ? 48 8B 87 ? ? ? ? 48 8D 8F");
+
+	const auto CEconItemAttributeVtable = mem->ResolveRelativeAddress(mem->SigScan(L"client.dll", "48 8D 05 ? ? ? ? 48 89 01 45 33 F6 65 48 8B 04 25"));
 }

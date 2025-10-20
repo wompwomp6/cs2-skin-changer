@@ -159,9 +159,10 @@
     <ClInclude Include="ext\sigs.h" />
     <ClInclude Include="ext\skindb.h" />
     <ClInclude Include="src\menu.h" />
-    <ClInclude Include="src\SDK\entity\arms.h" />
-    <ClInclude Include="src\SDK\entity\entity.h" />
-    <ClInclude Include="src\SDK\weapon\weapon.h" />
+    <ClInclude Include="src\SDK\CEconItemAttributeManager.h" />
+    <ClInclude Include="src\SDK\entity\C_CS2HudModelArms.h" />
+    <ClInclude Include="src\SDK\entity\dwEntityListManager.h" />
+    <ClInclude Include="src\SDK\weapon\C_EconEntity.h" />
     <ClInclude Include="src\window\window.hpp" />
   </ItemGroup>
   <ItemGroup>
