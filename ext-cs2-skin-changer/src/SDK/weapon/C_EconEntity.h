@@ -1,6 +1,8 @@
 #include "../../../ext/sigs.h"
 #include "../../../ext/offsets.h"
 
+#include "../../../ext/wcl.h"
+
 #pragma once
 
 enum ItemIds
@@ -108,31 +110,73 @@ std::string WeaponIdToString(int weaponId)
     }
 }
 
-void UpdateSkin()
+void UpdateSkin(const uintptr_t weapon)
 {
-    mem->CallThread(Sigs::SwitchHands);
-    Sleep(10);
-    mem->CallThread(Sigs::SwitchHands);
+    //wcl->CallFunction(Sigs::RegenerateWeaponSkins);
 
-    Sleep(50);
-
-    mem->CallThread(Sigs::RegenerateWeaponSkins);
     
-    mem->SwapPatch(Sigs::ForceUpdateHud, 2, 250);
+
+    //wcl->CallFunction(Sigs::UpdateComposite2,
+    //    {
+    //        CArg{ ASM::RCX, weapon + 0x5F8 },
+    //        CArg{ ASM::dl, true },
+    //    }
+    //    );
+
+    //if (!mem->Read<uint64_t>(weapon + 0xA98))
+    //{
+    //    wcl->CallFunction(Sigs::UpdateModel,
+    //        {
+    //            CArg{ ASM::RCX, weapon },
+    //            CArg{ ASM::dl, false }
+    //        }
+    //    );
+    //
+    //    Sleep(50);
+    //}
+    //
+    wcl->CallFunction(Sigs::UpdateSkin,
+        {
+            CArg{ ASM::RCX, weapon },
+            CArg{ ASM::dl, true },
+        }
+    );
+    
+    //mem->SwapPatch(Sigs::ForceUpdateHud, 2, 250);
 }
 
 void SetMeshMask(const uintptr_t ent, const uint64_t mask)
 {
-    const auto& node = mem->Read<uintptr_t>(ent + Offsets::m_pGameSceneNode);
-    const auto model = node + Offsets::m_modelState;
-    const auto dirtyAttributes = mem->Read<uintptr_t>(model + 0x108);
+    wcl->CallFunction(Sigs::SetMeshMask,
+        {
+            CArg{ ASM::RCX, mem->Read<uintptr_t>(ent + Offsets::m_pGameSceneNode) },
+            CArg{ ASM::RDX, mask },
+        });
+}
 
-    if (model + Offsets::m_MeshGroupMask == mask)
-        return;
+namespace Attributes
+{
+    const std::string Skin = "set item texture prefab";
+    const std::string Seed = "set item texture seed";
+    const std::string Wear = "set item texture wear";
+    const std::string StatTrack = "kill eater";
+}
 
-    for (int i = 0; i < 1000; i++)
-    {
-        mem->Write<uint64_t>(model + Offsets::m_MeshGroupMask, mask);
-    }
-    mem->Write<uint64_t>(dirtyAttributes + 0x10, mask);
+void AddAttribute(const uintptr_t item, const std::string attribute, float value)
+{
+    const uintptr_t pAttribute = mem->Allocate(NULL, MemPage);
+    const uintptr_t pValue = wcl->FuncAlloc(Sigs::SetAttribute);
+    mem->WriteString(pAttribute, attribute);
+    mem->Write<float>(pValue, value);
+
+    wcl->CallFunction(Sigs::SetAttribute,
+        {
+            CArg{ ASM::RCX, item },
+            CArg{ ASM::RDX, pAttribute },
+            CArg{ ASM::Xmm2, pValue }
+        }
+    );
+
+    mem->Free(pAttribute, MemPage);
+    mem->Free(pValue, MemPage);
 }

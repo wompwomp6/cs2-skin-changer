@@ -209,6 +209,46 @@ public:
         return 0;  // Not found
     }
 
+    uintptr_t GetVtableFunc(const uintptr_t& Vtable, uint16_t Index)
+    {
+        return Read<uintptr_t>(Vtable + (sizeof(uintptr_t) * Index));
+    }
+
+    bool IsAllocated(uintptr_t address)
+    {
+        MEMORY_BASIC_INFORMATION mbi;
+        SIZE_T result = VirtualQueryEx(hProcess, reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi));
+
+        if (result == 0)
+            return false; // Query failed
+
+        // Check if the memory is committed and accessible
+        if (mbi.State == MEM_COMMIT && (mbi.Protect & PAGE_NOACCESS) == 0 && (mbi.Protect & PAGE_GUARD) == 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    uintptr_t GetFreeMemoryRegion(size_t size)
+    {
+        uintptr_t address = NULL;
+        size_t validRegionCount = NULL;
+        while (true)
+        {
+            if (IsAllocated(address) && !Read<uint8_t>(address))
+                validRegionCount++;
+            else
+                validRegionCount = NULL;
+
+            if (validRegionCount == size)
+                return address - validRegionCount + 1;
+
+            address++;
+        }
+    }
+
     void Patch(uintptr_t address, int size)
     {
         if (!address)

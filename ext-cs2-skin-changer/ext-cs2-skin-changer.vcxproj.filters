@@ -101,7 +101,10 @@
     <ClInclude Include="ext\a2x\offsets.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\SDK\CEconItemAttributeManager.h">
+    <ClInclude Include="ext\wcl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SDK\vtable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
