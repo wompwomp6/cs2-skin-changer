@@ -7,6 +7,8 @@
 #include "SDK/entity/dwEntityListManager.h"
 #include "SDK/entity/C_CS2HudModelArms.h"
 
+#include "SDK/MurmurHash2/MurmurHash2.h"
+
 #include "../ext/wcl.h"
 
 SkinInfo_t GetActiveSkin(const WeaponsEnum& def)
@@ -32,7 +34,35 @@ SkinInfo_t GetActiveSkin(const WeaponsEnum& def)
 
 void OnMelee(const uintptr_t& pKnife)
 {
+    const uintptr_t item = pKnife + Offsets::m_AttributeManager + Offsets::m_Item;
+    std::string& model = ActiveKnife.model;
+    const uint16_t definition = ActiveKnife.defIndex;
+    if (!definition)
+        return;
 
+    const std::string str = std::to_string(definition);
+    const uint64_t targetSubclassID = MurmurHash2LowerCaseA(str.c_str(), str.length(), STRINGTOKEN_MURMURHASH_SEED);
+
+    if (mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex) != definition &&
+        mem->Read<uint64_t>(pKnife + Offsets::m_nSubclassID) != targetSubclassID)
+    {
+        mem->Write<uint16_t>(item + Offsets::m_iItemDefinitionIndex, definition);
+        mem->Write<uint64_t>(pKnife + Offsets::m_nSubclassID, targetSubclassID);
+
+        UpdateSubclass(pKnife);
+
+        SetModel(pKnife, model);
+
+		Sleep(50);
+
+        const uintptr_t hudWeapon = GetHudWeapon(pKnife);
+        SetModel(hudWeapon, model);
+
+        Sleep(1000);
+
+
+        //UpdateWeapon(pKnife);
+    }
 }
 
 void OnWeapon(const uintptr_t& pWeapon)
@@ -40,101 +70,97 @@ void OnWeapon(const uintptr_t& pWeapon)
     const uintptr_t hudWeapon = GetHudWeapon(pWeapon);
     const uintptr_t item = pWeapon + Offsets::m_AttributeManager + Offsets::m_Item;
 
-	SkinInfo_t activeSkin = GetActiveSkin(static_cast<WeaponsEnum>(mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex)));
+	//SkinInfo_t activeSkin = GetActiveSkin(static_cast<WeaponsEnum>(mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex)));
+    SkinInfo_t activeSkin = GetSkin(static_cast<WeaponsEnum>(mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex)));
 
     if (mem->Read<int32_t>(pWeapon + Offsets::m_nFallbackPaintKit) != activeSkin.Paint)
     {
         SetMeshMask(pWeapon, 1 + activeSkin.bUsesOldModel);
         SetMeshMask(hudWeapon, 1 + activeSkin.bUsesOldModel);
 
-        mem->Write<uint32_t>(item + Offsets::m_iItemIDHigh, -1);
+        mem->Write<uint32_t>(item + Offsets::m_iItemIDHigh, ItemIds::UseFallBackValues);
         mem->Write<int32_t>(pWeapon + Offsets::m_nFallbackPaintKit, activeSkin.Paint);
     }
 
     UpdateWeapon(pWeapon);
 }
+ 
+void OnGloves(const uintptr_t& pGloves)
+{
+    //std::cout << mem->Read<uint64_t>(mem->Read<uintptr_t>(GetHudArms() + Offsets::m_pGameSceneNode) + Offsets::m_modelState + Offsets::m_MeshGroupMask) << std::endl;
+    //std::cout << mem->Read<uint64_t>(mem->Read<uintptr_t>(mem->Read<uintptr_t>(GetHudArms() + Offsets::m_pGameSceneNode) + Offsets::m_modelState + 0x108) + 0x10) << std::endl;
+    //
+    //mem->Write<uint32_t>(pGloves + Offsets::m_iItemIDHigh, ItemIds::UseFallBackValues);
+    //mem->Write<uint16_t>(pGloves + Offsets::m_iItemDefinitionIndex, 5030);
+    //AddAttribute(pGloves, Attributes::Skin, 10048.f);
+    
+    //SetMeshMask(GetHudArms(), 1);
+
+    //mem->Write<bool>(pGloves + Offsets::m_bInitialized, true);
+    //mem->Write<bool>(GetLocalPlayer() + Offsets::m_bNeedToReApplyGloves, true);
+    //
+    std::cout << mem->Read<uint64_t>(mem->Read<uintptr_t>(GetHudArms() + Offsets::m_pGameSceneNode) + Offsets::m_modelState + Offsets::m_MeshGroupMask) << std::endl;
+    std::cout << mem->Read<uint64_t>(mem->Read<uintptr_t>(mem->Read<uintptr_t>(GetHudArms() + Offsets::m_pGameSceneNode) + Offsets::m_modelState + 0x108) + 0x10) << std::endl;
+    std::cout << std::hex << mem->Read<uintptr_t>(GetHudArms() + Offsets::m_pGameSceneNode) + Offsets::m_modelState + Offsets::m_MeshGroupMask << std::endl;
+}
+
+void OnAgent(const uintptr_t& pPawn)
+{
+    std::cout << std::hex << mem->Read<uint64_t>(pPawn + Offsets::m_nSubclassID) << std::endl;
+    std::cout << std::hex << mem->Read<uint64_t>(GetHudArms() + Offsets::m_nSubclassID) << std::endl;
+
+    return;
+    SetModel(GetHudArms(), "phase2/characters/models/ctm_fbi/ctm_fbi_varianta_ag2.vmdl"); //works
+
+	Sleep(50);
+
+	SetModel(pPawn, "characters/models/ctm_fbi/ctm_fbi_varianta.vmdl"); // does not work
+
+	//only sets viewmodel not body
+}
 
 int main()
 {
+    skindb->Dump();
+
+    overlay::Setup();
+
+	std::cout << "Discord Overlay Hooked!" << std::endl;
+	std::cout << "CS2 Skin Changer Loaded!" << std::endl;
+
     while (true)
-    {
-        Sleep(500);
+    { 
+		Sleep(1);
+
+		overlay::Render();
 
         const uintptr_t localPlayer = GetLocalPlayer();
         const uintptr_t weapon = mem->Read<uintptr_t>(localPlayer + Offsets::m_pClippingWeapon);
         if (!localPlayer || !weapon)
             continue;
 
+        RenderMenu(weapon);
+
+		//OnAgent(localPlayer);
+        //exit(0);
+		//OnGloves(localPlayer + Offsets::m_EconGloves);
+        //exit(0);
+        //continue;
+
         if (IsMeleeWeapon(weapon))
         {
-            OnMelee(weapon);
+            if(bKnife)
+                OnMelee(weapon);
         }
         else
         {
             OnWeapon(weapon);
         }
+
+		overlay::EndRender();
     }
 
+    overlay::CloseOverlay();
+
     return 0;
-
-    ////mem->Write<uint32_t>(localPlayer + Offsets::m_EconGloves + Offsets::m_iItemIDHigh, -1);
-    ////mem->Write<uint16_t>(localPlayer + Offsets::m_EconGloves + Offsets::m_iItemDefinitionIndex, 5030);
-    ////AddAttribute(localPlayer + Offsets::m_EconGloves, Attributes::Skin, 10048.f);
-    ////
-    ////mem->Write<bool>(localPlayer + Offsets::m_EconGloves + Offsets::m_bInitialized, true);
-    ////mem->Write<bool>(localPlayer + Offsets::m_bNeedToReApplyGloves, true);
-
-    //std::string model = "weapons/models/knife/knife_karambit/weapon_knife_karambit.vmdl";
-    //std::string model = "weapons/models/knife/knife_m9/weapon_knife_m9.vmdl";
-    //
-    //SetModel(weapon, model);
-    //SetModel(hudWeapon, model);
-    //
-   // return 0;
-   //
-   // static const std::map<uint16_t, uint64_t> m_subclassIdMap = {
-   //         {500, 3933374535},
-   //         {503, 3787235507},
-   //         {505, 4046390180},
-   //         {506, 2047704618},
-   //         {507, 1731408398},
-   //         {508, 1638561588},
-   //         {509, 2282479884},
-   //         {512, 3412259219},
-   //         {514, 2511498851},
-   //         {515, 1353709123},
-   //         {516, 4269888884},
-   //         {517, 1105782941},
-   //         {518, 275962944},
-   //         {519, 1338637359},
-   //         {520, 3230445913},
-   //         {521, 3206681373},
-   //         {522, 2595277776},
-   //         {523, 4029975521},
-   //         {524, 2463111489},
-   //         {525, 365028728},
-   //         {526, 3845286452},
-   // };
-   //
-   // const uint16_t definition = 508;
-   // const uint64_t targetSubclassID = m_subclassIdMap.at(definition);
-   //
-   // mem->Write<uint16_t>(item + Offsets::m_iItemDefinitionIndex, definition);
-   // mem->Write<uint64_t>(weapon + Offsets::m_nSubclassID, targetSubclassID);
-   //
-   // UpdateSubclass(weapon);
-   //
-   // return 0;
-
-
-    //
-
-
-    //UpdateSubclass(weapon);
-
-    //UpdateModel(weapon);
-    //UpdateModel(hudWeapon);
-
-    //SetModel(weapon, model);
-    //SetModel(hudWeapon, model);
 }

@@ -14,50 +14,112 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* use
     return size * nmemb;
 }
 
+std::unordered_map<uint16_t, std::string> KnifeModels = {
+    {500, "phase2/weapons/models/knife/knife_bayonet/weapon_knife_bayonet_ag2.vmdl"},
+    {503, "phase2/weapons/models/knife/knife_css/weapon_knife_css_ag2.vmdl"},
+    {505, "phase2/weapons/models/knife/knife_flip/weapon_knife_flip_ag2.vmdl"},
+    {506, "phase2/weapons/models/knife/knife_gut/weapon_knife_gut_ag2.vmdl"},
+    {507, "phase2/weapons/models/knife/knife_karambit/weapon_knife_karambit_ag2.vmdl"},
+    {508, "phase2/weapons/models/knife/knife_m9/weapon_knife_m9_ag2.vmdl"},
+    {509, "phase2/weapons/models/knife/knife_tactical/weapon_knife_tactical_ag2.vmdl"},
+    {512, "phase2/weapons/models/knife/knife_falchion/weapon_knife_falchion_ag2.vmdl"},
+    {514, "phase2/weapons/models/knife/knife_bowie/weapon_knife_bowie_ag2.vmdl"},
+    {515, "phase2/weapons/models/knife/knife_butterfly/weapon_knife_butterfly_ag2.vmdl"},
+    {516, "phase2/weapons/models/knife/knife_push/weapon_knife_push_ag2.vmdl"},
+    {517, "phase2/weapons/models/knife/knife_cord/weapon_knife_cord_ag2.vmdl"},
+    {518, "phase2/weapons/models/knife/knife_canis/weapon_knife_canis_ag2.vmdl"},
+    {519, "phase2/weapons/models/knife/knife_ursus/weapon_knife_ursus_ag2.vmdl"},
+    {520, "phase2/weapons/models/knife/knife_navaja/weapon_knife_navaja_ag2.vmdl"},
+    {521, "phase2/weapons/models/knife/knife_outdoor/weapon_knife_outdoor_ag2.vmdl"},
+    {522, "phase2/weapons/models/knife/knife_stiletto/weapon_knife_stiletto_ag2.vmdl"},
+    {523, "phase2/weapons/models/knife/knife_talon/weapon_knife_talon_ag2.vmdl"},
+    {525, "phase2/weapons/models/knife/knife_skeleton/weapon_knife_skeleton_ag2.vmdl"},
+    {526, "phase2/weapons/models/knife/knife_kukri/weapon_knife_kukri_ag2.vmdl"}
+};
+std::map<uint16_t, std::string> KnifeNames = {
+    {500, "Bayonet"},
+    {503, "Classic"},
+    {505, "Flip"},
+    {506, "Gut"},
+    {507, "Karambit"},
+    {508, "M9 Bayonet"},
+    {509, "Huntsman"},
+    {512, "Falchion"},
+    {514, "Bowie"},
+    {515, "Butterfly"},
+    {516, "Daggers"},
+    {517, "Paracord"},
+    {518, "Survival"},
+    {519, "Ursus"},
+    {520, "Navaja"},
+    {521, "Nomad"},
+    {522, "Stiletto"},
+    {523, "Talon"},
+    {525, "Skeleton"},
+    {526, "Kukri"}
+};
+
+class Knife
+{
+public:
+    Knife(const uint16_t def = 0)
+    {
+        defIndex = def;
+        if (def)
+        {
+            name = KnifeNames.at(def);
+            model = KnifeModels.at(def);
+        }  
+    }
+
+    uint16_t defIndex;
+	std::string name;
+	std::string model;
+    
+};
+
+std::vector<Knife> Knifes = {
+    Knife(500), Knife(503), Knife(505), Knife(506), Knife(507),
+    Knife(508), Knife(509), Knife(512), Knife(514), Knife(516),
+    Knife(517), Knife(518), Knife(519), Knife(520), Knife(521),
+    Knife(522), Knife(523), Knife(525), Knife(526)
+};
+
 struct SkinInfo_t {
-    int Paint;  
-    bool bUsesOldModel; 
+    int Paint;
+    bool bUsesOldModel;
     std::string name;
     WeaponsEnum weaponType;
 };
 
-class VInv
+std::vector<SkinInfo_t> Skins;
+Knife ActiveKnife = Knife();
+
+void AddSkin(SkinInfo_t AddedSkin)
 {
-private:
-    std::vector<SkinInfo_t>* skins = new std::vector<SkinInfo_t>();
-public:
-    void AddSkin(SkinInfo_t& Skin)
+    for (SkinInfo_t& skin : Skins)
     {
-        for (auto& skin : *skins)
-        {
-            if (skin.weaponType == Skin.weaponType)
-            {
-                skin = Skin;
-                return;
-            }     
-        }
-
-        skins->push_back(Skin);
+        if(skin.weaponType == AddedSkin.weaponType)
+			skin = AddedSkin;
     }
 
-    SkinInfo_t GetSkin(WeaponsEnum def)
-    {
-        for (const auto& skin : *skins)
-        {
-            if (skin.weaponType == def)
-                return skin;
-        }
+	Skins.push_back(AddedSkin);
+}
 
-        return SkinInfo_t();
+SkinInfo_t GetSkin(const WeaponsEnum def)
+{
+    for (SkinInfo_t& skin : Skins)
+    {
+        if (skin.weaponType == def)
+			return skin;
     }
-};
-VInv* vInv = new VInv();
+}
 
 class CSkinDB {
 private:
-    std::vector<SkinInfo_t>* knifeSkins = new std::vector<SkinInfo_t>();
-    std::vector<SkinInfo_t>* gloveSkins = new std::vector<SkinInfo_t>();
-    std::vector<SkinInfo_t>* weaponSkins = new std::vector<SkinInfo_t>();
+    std::vector<SkinInfo_t> knifeSkins;
+    std::vector<SkinInfo_t> gloveSkins;
+    std::vector<SkinInfo_t> weaponSkins;
 
     std::string GetStringSafe(const nlohmann::json& j, const std::string& key) {
         if (!j.contains(key)) return "";
@@ -79,11 +141,11 @@ private:
     }
 
     std::vector<std::string> knifeTypes = {
-                    "Bayonet", "Classic Knife", "Flip Knife", "Gut Knife",
-                    "Karambit", "M9 Bayonet", "Huntsman Knife", "Falchion Knife",
-                    "Bowie Knife", "Butterfly Knife", "Shadow Daggers", "Paracord Knife",
-                    "Survival Knife", "Ursus Knife", "Navaja Knife", "Nomad Knife",
-                    "Stiletto Knife", "Talon Knife", "Skeleton Knife", "Kukri Knife"
+        "Bayonet", "Classic Knife", "Flip Knife", "Gut Knife",
+        "Karambit", "M9 Bayonet", "Huntsman Knife", "Falchion Knife",
+        "Bowie Knife", "Butterfly Knife", "Shadow Daggers", "Paracord Knife",
+        "Survival Knife", "Ursus Knife", "Navaja Knife", "Nomad Knife",
+        "Stiletto Knife", "Talon Knife", "Skeleton Knife", "Kukri Knife"
     };
 
     std::vector<std::string> gloveTypes = {
@@ -191,15 +253,15 @@ public:
 
                 if (isKnife)
                 {
-                    knifeSkins->push_back(info);
+                    knifeSkins.push_back(info);
                     continue;
                 }
                 if (isGlove)
                 {
-                    gloveSkins->push_back(info);
+                    gloveSkins.push_back(info);
                     continue;
                 }
-                weaponSkins->push_back(info);     
+                weaponSkins.push_back(info);     
             }
         }
         catch (const std::exception& e) {
@@ -207,11 +269,11 @@ public:
         }
     }
 
-    std::vector<SkinInfo_t> GetWeapons(WeaponsEnum type = WeaponsEnum::none)
+    std::vector<SkinInfo_t> GetWeaponSkins(WeaponsEnum type = WeaponsEnum::none)
     {
         std::vector<SkinInfo_t> results;
 
-        for (const auto& skin : *weaponSkins)
+        for (const auto& skin : weaponSkins)
         {
             if (type != WeaponsEnum::none && skin.weaponType != type)
                 continue;

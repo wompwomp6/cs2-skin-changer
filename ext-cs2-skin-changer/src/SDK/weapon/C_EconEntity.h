@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define STRINGTOKEN_MURMURHASH_SEED 0x31415926
+
 enum ItemIds
 {
     NoSkinValues = 0,
