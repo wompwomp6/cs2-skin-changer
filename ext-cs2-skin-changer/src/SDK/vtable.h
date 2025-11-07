@@ -6,4 +6,5 @@ enum Vtable
 	UpdateFallbackData = 13709,
 	ClientSideReloadCustomEcon = 8,
 	CompSec = 103,
+	HudShow = 315,
 };

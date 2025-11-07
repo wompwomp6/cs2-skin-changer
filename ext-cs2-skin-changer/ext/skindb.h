@@ -80,7 +80,7 @@ public:
 
 std::vector<Knife> Knifes = {
     Knife(500), Knife(503), Knife(505), Knife(506), Knife(507),
-    Knife(508), Knife(509), Knife(512), Knife(514), Knife(516),
+    Knife(508), Knife(509), Knife(512), Knife(514), Knife(515), Knife(516),
     Knife(517), Knife(518), Knife(519), Knife(520), Knife(521),
     Knife(522), Knife(523), Knife(525), Knife(526)
 };

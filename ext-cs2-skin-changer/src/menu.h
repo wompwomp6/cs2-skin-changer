@@ -47,7 +47,7 @@ void RenderWeaponTab()
 
 	if (ImGui::Button("Force Update"))
 	{
-		wcl->CallFunction(Sigs::RegenerateWeaponSkins);
+		UpdateWeapon();
 	}
 }
 

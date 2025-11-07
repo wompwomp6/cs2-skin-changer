@@ -150,34 +150,41 @@ void SetMeshMask(const uintptr_t& ent, const uint64_t mask)
     }
 }
 
-void UpdateWeapon(const uintptr_t& weapon)
+void UpdateWeapon(const uintptr_t& weapon = NULL)
 {
-    //wcl->CallFunction(mem->GetVtableFunc(mem->Read<uintptr_t>(weapon), Vtable::UpdateFallbackData),
-    wcl->CallFunction(mem->SigScan(L"client.dll", "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 8B DA 48 8B F9 E8 ? ? ? ? F6 C3 ? 0F 84 ? ? ? ? 48 8B 87"), //UpdateFallbackData
-        {
-            CArg{ ASM::RCX, weapon },
-            CArg{ ASM::dl, true },
-        });
-
-    if (mem->Read<uint64_t>(weapon + 0xA98) > 0)
+    if (weapon)
     {
-        wcl->CallFunction(Sigs::RegenerateWeaponSkins);
-    }
-    else
-    {
-        const uintptr_t& CompositeMaterial = weapon + 0x5F8;
-        wcl->CallFunction(Sigs::UpdateComposite,
+        //wcl->CallFunction(mem->GetVtableFunc(mem->Read<uintptr_t>(weapon), Vtable::UpdateFallbackData),
+        wcl->CallFunction(mem->SigScan(L"client.dll", "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 8B DA 48 8B F9 E8 ? ? ? ? F6 C3 ? 0F 84 ? ? ? ? 48 8B 87"), //UpdateFallbackData
             {
-                CArg{ ASM::RCX, CompositeMaterial },
+                CArg{ ASM::RCX, weapon },
                 CArg{ ASM::dl, true },
             });
 
-        wcl->CallFunction(Sigs::UpdateModel,
-            {
-                CArg{ ASM::RCX, weapon },
-                //CArg{ ASM::dl, false },
-            });
-    } 
+        if (!mem->Read<uint64_t>(weapon + 0xA98))
+        {
+            const uintptr_t& CompositeMaterial = weapon + 0x5F8;
+            wcl->CallFunction(Sigs::UpdateComposite,
+                {
+                    CArg{ ASM::RCX, CompositeMaterial },
+                    CArg{ ASM::dl, true },
+                });
+
+            wcl->CallFunction(Sigs::UpdateModel,
+                {
+                    CArg{ ASM::RCX, weapon },
+                    //CArg{ ASM::dl, false },
+                });
+        }
+    }
+
+    wcl->CallFunction(Sigs::RegenerateWeaponSkins);
+
+    static uintptr_t pHudShow = mem->GetVtableFunc(mem->Read<uintptr_t>(weapon), HudShow) + 1;
+
+    mem->Write<bool>(pHudShow, false);
+    Sleep(200);
+    mem->Write<bool>(pHudShow, true);
 }
 
 void SetModel(const uintptr_t& weapon, std::string model)
@@ -202,9 +209,9 @@ void UpdateModel(const uintptr_t& weapon)
 void UpdateSubclass(const uintptr_t& weapon)
 {
     wcl->CallFunction(Sigs::SubclassUpdate,
-        {
-            CArg{ ASM::RCX, weapon },
-        });
+    {
+        CArg{ ASM::RCX, weapon },
+    });
 }
 
 namespace Attributes

@@ -92,7 +92,7 @@ void OnMelee(const uintptr_t& pKnife)
         SetMeshMask(pKnife, 1);
         SetMeshMask(hudWeapon, 1);
 
-        //UpdateWeapon(pKnife);
+        UpdateWeapon(pKnife);
     }
 
     if (mem->Read<int32_t>(pKnife + Offsets::m_nFallbackPaintKit) != activeSkin.Paint)

@@ -92,7 +92,7 @@ public:
 
     void CallFunction(const uintptr_t FuncAddress, std::vector<CArg> args = {}, const bool BypassSafeDelay = false)
     {
-        if (!FuncAddress)
+        if (!FuncAddress || !mem->Read<uintptr_t>(FuncAddress))
             return;
 
         if (args.empty())
@@ -128,6 +128,8 @@ public:
 
         if (!BypassSafeDelay)
             Sleep(50);
+
+		//return true;//success
     }
 };
 WCL* wcl = new WCL();

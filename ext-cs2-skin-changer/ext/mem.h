@@ -214,7 +214,7 @@ public:
         return Read<uintptr_t>(Vtable + (sizeof(uintptr_t) * Index));
     }
 
-    template<typename T>
+    template<typename T = uint16_t>
     T FindVtableFunctionIndex(uintptr_t Vtable, uintptr_t address)
     {
         for (T i = 0; i < pow(2, sizeof(T)); i++)
