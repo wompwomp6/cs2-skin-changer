@@ -16,7 +16,7 @@ int main()
 
     while (true)
     { 
-		Sleep(50);
+		Sleep(1);
 
         const uintptr_t localPlayer = GetLocalPlayer();
         const uintptr_t weapon = mem->Read<uintptr_t>(localPlayer + Offsets::m_pClippingWeapon);
@@ -26,6 +26,8 @@ int main()
             continue;
 
         //std::cout << std::hex << weapon << std::endl;
+        //std::cout << std::hex << localPlayer << std::endl;
+        //std::cout << std::dec << GetEntityHandle(weapon) << std::endl;
         //const uintptr_t item = GetHudArms() + Offsets::m_AttributeManager + Offsets::m_Item;
         //std::cout << std::dec << mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex) << std::endl;
         //mem->Write<bool>(localPlayer + Offsets::m_EconGloves + Offsets::m_bRestoreCustomMaterialAfterPrecache, true);

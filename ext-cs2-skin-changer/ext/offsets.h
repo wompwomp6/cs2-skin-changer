@@ -6,6 +6,7 @@
 namespace Offsets
 {
     constexpr std::ptrdiff_t dwEntityList = cs2_dumper::offsets::client_dll::dwEntityList;
+    constexpr std::ptrdiff_t dwGameEntitySystem_highestEntityIndex = cs2_dumper::offsets::client_dll::dwGameEntitySystem_highestEntityIndex;
     constexpr std::ptrdiff_t dwLocalPlayerPawn = cs2_dumper::offsets::client_dll::dwLocalPlayerPawn;
 
     ///////////////////////////////////////////////////////////
@@ -44,4 +45,6 @@ namespace Offsets
     constexpr std::ptrdiff_t m_iItemIDHigh = cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemIDHigh; // uint32
 
     constexpr std::ptrdiff_t m_pVdata = 0x388; // uint32
+    constexpr std::ptrdiff_t m_pDrityModelData = 0x108; // uint32
+    constexpr std::ptrdiff_t m_DrityMeshGroupMask = 0x10; // uint32
 }

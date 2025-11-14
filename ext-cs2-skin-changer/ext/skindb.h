@@ -7,6 +7,16 @@
 #include <windows.h>
 #endif
 
+#include <Windows.h>
+#include <winhttp.h>
+#include <shlobj.h>
+#include <iostream>
+#include <fstream>
+#include <filesystem>
+
+#pragma comment(lib, "winhttp.lib")
+#pragma comment(lib, "shell32.lib")
+
 #pragma once
 
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
@@ -135,8 +145,8 @@ public:
 		return 0;
     }
 
-    void PharseJson();
-	void ExportJson();
+    //void PharseJson(//file path here);
+	//void ExportJson(//file path here);
 };
 SkinManager* skinManager = new SkinManager();
 
@@ -228,8 +238,14 @@ private:
         return WeaponsEnum(); // or some default/invalid value
     }
 
+    bool EnsureDirectory(const std::wstring& path)
+    {
+        return std::filesystem::create_directories(path) || std::filesystem::exists(path);
+    }
+
 public:
-    void Dump() {
+    void DumpSkindb() 
+    {
         CURL* curl = curl_easy_init();
         if (!curl) return;
 
@@ -292,15 +308,27 @@ public:
         catch (const std::exception& e) {
             std::cerr << "JSON parse error: " << e.what() << std::endl;
         }
+
+		std::cout << "Skindb dumped successfully!" << std::endl;
     }
+
+    void DumpSkinEconImages()
+    {
+
+        return;
+        
+		std::cout << "Econ images dumped successfully!" << std::endl;
+    }
+
+    inline void Dump() { DumpSkindb(); DumpSkinEconImages(); }
 
     std::vector<SkinInfo_t> GetWeaponSkins(WeaponsEnum type = WeaponsEnum::none)
     {
         std::vector<SkinInfo_t> results;
 
-		results.push_back(SkinInfo_t{ 0, false, "Vanila", WeaponsEnum::none});
+        results.push_back(SkinInfo_t{ 0, false, "Vanila", WeaponsEnum::none });
 
-        if(type == WeaponsEnum::none)
+        if (type == WeaponsEnum::none)
             return results;
 
         for (const auto& skin : weaponSkins)

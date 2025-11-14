@@ -160,7 +160,7 @@ namespace overlay {
         if (!Window) {
             system("cls");
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-            MessageBoxA(0, "Failed To Find Discord.", "Overlay", MB_OK);
+            MessageBoxA(0, "Failed To Find Discord.", "Overlay", MB_ICONSTOP);
             Sleep(5000);
             exit(1);
         }
@@ -189,7 +189,7 @@ namespace overlay {
 
     bool Setup() {
         hijack();
-        MessageBoxA(0, "Press *OK* Once In Game", "D5", MB_ICONINFORMATION);
+        //MessageBoxA(0, "Press *OK* Once In Game", "Overlay", MB_ICONINFORMATION);
         return CreateDeviceD3D(Window);
     }
 

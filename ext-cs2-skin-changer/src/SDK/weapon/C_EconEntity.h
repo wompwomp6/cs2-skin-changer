@@ -5,6 +5,8 @@
 
 #include "../entity/dwEntityListManager.h"
 
+#include <thread>
+
 #pragma once
 
 #define STRINGTOKEN_MURMURHASH_SEED 0x31415926
@@ -120,14 +122,36 @@ void SetMeshMask(const uintptr_t& ent, const uint64_t mask)
 {
     const auto& node = mem->Read<uintptr_t>(ent + Offsets::m_pGameSceneNode);
     const auto model = node + Offsets::m_modelState;
-    const auto dirtyAttributes = mem->Read<uintptr_t>(model + 0x108);
+    const auto dirtyAttributes = mem->Read<uintptr_t>(model + Offsets::m_pDrityModelData);
 
     for (int i = 0; i < 1000; i++)
     {
         mem->Write<uint64_t>(model + Offsets::m_MeshGroupMask, mask);
-        mem->Write<uint64_t>(dirtyAttributes + 0x10, mask);
+        mem->Write<uint64_t>(dirtyAttributes + Offsets::m_DrityMeshGroupMask, mask);
     }
 }
+
+static bool HudUpdating = false;
+void UpdateHudThread(const uintptr_t weaponVtable)
+{
+    if (!weaponVtable || HudUpdating)
+		return;
+
+    HudUpdating = true;
+
+    const uintptr_t oHudShow = mem->GetVtableFunc(weaponVtable, HudShow);
+    const uintptr_t pUpdateHudWeaponFunc = mem->MakeFunction({ 0xB0, 0x00, 0xC3 }, oHudShow);
+
+    mem->SwapVtableFunc(weaponVtable, HudShow, pUpdateHudWeaponFunc);
+    Sleep(300);
+    mem->SwapVtableFunc(weaponVtable, HudShow, oHudShow);
+
+    mem->Free(pUpdateHudWeaponFunc, MemPage);
+
+    HudUpdating = false;
+}
+
+inline void UpdateHud(const uintptr_t weaponVtable) { std::thread updateHudThread(UpdateHudThread, weaponVtable); updateHudThread.detach();};
 
 void UpdateWeapon(const uintptr_t& weapon = NULL)
 {
@@ -144,14 +168,7 @@ void UpdateWeapon(const uintptr_t& weapon = NULL)
             wcl->CallFunction(Sigs::UpdateModel, {{ ASM::RCX, weapon }});
         }
         
-        const uintptr_t oHudShow = mem->GetVtableFunc(weaponVtable, HudShow);
-        const uintptr_t pUpdateHudWeaponFunc = mem->MakeFunction({ 0xB0, 0x00, 0xC3 }, oHudShow);
-
-        mem->SwapVtableFunc(weaponVtable, HudShow, pUpdateHudWeaponFunc);
-        Sleep(300);
-        mem->SwapVtableFunc(weaponVtable, HudShow, oHudShow);
-
-        mem->Free(pUpdateHudWeaponFunc, MemPage);
+        UpdateHud(weaponVtable);
     }
 
     wcl->CallFunction(Sigs::RegenerateWeaponSkins);

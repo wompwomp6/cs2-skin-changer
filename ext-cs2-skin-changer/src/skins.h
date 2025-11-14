@@ -8,8 +8,8 @@
 
 void OnWeapon(const uintptr_t& pWeapon)
 {
-    const uintptr_t hudWeapon = GetHudWeapon(pWeapon);
-    const uintptr_t item = pWeapon + Offsets::m_AttributeManager + Offsets::m_Item;
+    const uintptr_t& hudWeapon = GetHudWeapon(pWeapon);
+    const uintptr_t& item = pWeapon + Offsets::m_AttributeManager + Offsets::m_Item;
     SkinInfo_t activeSkin = skinManager->GetSkin(CurrentWeaponDef);
     if (!activeSkin.Paint)
         return;
@@ -22,7 +22,7 @@ void OnWeapon(const uintptr_t& pWeapon)
         mem->Write<uint32_t>(item + Offsets::m_iItemIDHigh, ItemIds::UseFallBackValues);
         mem->Write<int32_t>(pWeapon + Offsets::m_nFallbackPaintKit, activeSkin.Paint);
 
-        ShouldUpdateWeapon = true;
+        ShouldUpdateWeapon = true; 
     }
 }
 
@@ -58,21 +58,23 @@ void OnMelee(const uintptr_t& pKnife)
 {
     const uintptr_t item = pKnife + Offsets::m_AttributeManager + Offsets::m_Item;
     std::string& model = skinManager->ActiveKnife.model;
+    const uintptr_t& hudWeapon = GetHudWeapon(pKnife);
     const uint16_t definition = skinManager->ActiveKnife.defIndex;
     if (!definition)
         return;
 
     const std::string str = std::to_string(definition);
-    const uint64_t targetSubclassID = MurmurHash2LowerCaseA(str.c_str(), str.length(), STRINGTOKEN_MURMURHASH_SEED);
+    const uint32_t targetSubclassID = MurmurHash2LowerCaseA(str.c_str(), str.length(), STRINGTOKEN_MURMURHASH_SEED);
 
     //static SkinInfo_t activeSkin = SkinInfo_t{ 409, false, "", WeaponsEnum::none };
     static SkinInfo_t activeSkin = SkinInfo_t{ 618, false, "", WeaponsEnum::none };
 
     if (mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex) != definition &&
-        mem->Read<uint64_t>(pKnife + Offsets::m_nSubclassID) != targetSubclassID)
+        mem->Read<uint32_t>(pKnife + Offsets::m_nSubclassID) != targetSubclassID)
     {
         mem->Write<uint16_t>(item + Offsets::m_iItemDefinitionIndex, definition);
-        mem->Write<uint64_t>(pKnife + Offsets::m_nSubclassID, targetSubclassID);
+        //mem->Write<uint32_t>(pKnife + 0x314, targetSubclassID); crash
+        mem->Write<uint32_t>(pKnife + Offsets::m_nSubclassID, targetSubclassID);
 
         UpdateSubclass(pKnife);
 
@@ -80,32 +82,27 @@ void OnMelee(const uintptr_t& pKnife)
 
         Sleep(50);
 
-        const uintptr_t hudWeapon = GetHudWeapon(pKnife);
         SetModel(hudWeapon, model);
 
-        Sleep(100);
-
+        Sleep(50);
+        
         SetMeshMask(pKnife, 1);
         SetMeshMask(hudWeapon, 1);
 
-        UpdateWeapon(pKnife);
+        ShouldUpdateWeapon = true;
     }
 
-    if (mem->Read<int32_t>(pKnife + Offsets::m_nFallbackPaintKit) != activeSkin.Paint)
-    {
-        Sleep(100);
-
-        mem->Write<bool>(item + Offsets::m_bRestoreCustomMaterialAfterPrecache, true);
-
-        mem->Write<uint32_t>(item + Offsets::m_iItemIDHigh, ItemIds::UseFallBackValues);
-        mem->Write<int32_t>(pKnife + Offsets::m_nFallbackPaintKit, activeSkin.Paint);
-
-        UpdateWeapon(pKnife);
-        Sleep(100);
-        UpdateWeapon(pKnife);
-
-		SetMeshMask(pKnife, 1);
-    }
+    //if (mem->Read<int32_t>(pKnife + Offsets::m_nFallbackPaintKit) != activeSkin.Paint)
+    //{
+    //    mem->Write<bool>(item + Offsets::m_bRestoreCustomMaterialAfterPrecache, true);
+    //
+    //    mem->Write<uint32_t>(item + Offsets::m_iItemIDHigh, ItemIds::UseFallBackValues);
+    //    mem->Write<int32_t>(pKnife + Offsets::m_nFallbackPaintKit, activeSkin.Paint);
+    //
+	//	SetMeshMask(pKnife, 1);
+    //
+    //    ShouldUpdateWeapon = true;
+    //}
 }
 
 void OnAgent(const uintptr_t& pPawn)

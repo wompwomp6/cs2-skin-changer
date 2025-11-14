@@ -97,7 +97,7 @@ void RenderMenu()
 	ImGui::BeginChild("Sidebar", ImVec2(120, 0), true);
 	{
 		if (ImGui::Button("Skins", ImVec2(100, 30))) active_tab = 0;
-		if (ImGui::Button("Gloves", ImVec2(100, 30))) active_tab = 1;
+		//if (ImGui::Button("Gloves", ImVec2(100, 30))) active_tab = 1;
 		if (ImGui::Button("Knifes", ImVec2(100, 30))) active_tab = 2;
 	}
 	ImGui::EndChild();
@@ -129,7 +129,7 @@ void MenuThreadFunc()
 {
 	while (true)
 	{
-		Sleep(5);
+		Sleep(1);
 		overlay::Render();
 		RenderMenu();
 		overlay::EndRender();
