@@ -6,13 +6,10 @@
 static WeaponsEnum CurrentWeaponDef;
 
 static int selectedSkinIndex = 0;
-static bool bSkin = false;
 
 void RenderWeaponTab()
 {
     const std::vector<SkinInfo_t> availableSkins = skindb->GetWeaponSkins(CurrentWeaponDef);
-
-    ImGui::Checkbox("Skins", &bSkin);
 
     // Safety: ensure selectedSkinIndex is valid for this availableSkins
     if (availableSkins.empty()) {
@@ -44,9 +41,6 @@ void RenderWeaponTab()
 
     if (selectedSkinIndex != 0) // keep existing semantic for default slot 0
 		skinManager->AddSkin(availableSkins[selectedSkinIndex]);
-
-	if (ImGui::Button("Force Update"))
-		ShouldUpdateWeapon = true;
 }
 
 void RenderGlovesTab()

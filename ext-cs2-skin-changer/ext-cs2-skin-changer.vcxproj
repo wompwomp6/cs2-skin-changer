@@ -169,6 +169,7 @@
     <ClInclude Include="src\SDK\weapon\CAttributeList.h" />
     <ClInclude Include="src\SDK\weapon\CHudWeapon.h" />
     <ClInclude Include="src\SDK\weapon\C_EconEntity.h" />
+    <ClInclude Include="src\SDK\weapon\weapon.h" />
     <ClInclude Include="src\skins.h" />
     <ClInclude Include="src\window\window.hpp" />
   </ItemGroup>

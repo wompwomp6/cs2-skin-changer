@@ -31,11 +31,6 @@ uint16_t GetEntityHandle(const uintptr_t& ent)
     return NULL;
 }
 
-enum PostDataUpdateIds
-{
-	Update = 1,
-};
-
 class ClientEnt
 {
 public:
@@ -64,8 +59,7 @@ ClientEnt GetClientEnt(const uintptr_t CGameEntitySystem, const uint32_t index)
 
 uint32_t GetClientEntIndex(const uintptr_t CGameEntitySystem, const uintptr_t ent)
 {
-    const uintptr_t clientEntities = GetClientEntCount(CGameEntitySystem);
-
+    const uint64_t clientEntities = GetClientEntCount(CGameEntitySystem);
     for (uint32_t i = 0; i < clientEntities; i++)
     {
         const ClientEnt CurrentEnt = GetClientEnt(CGameEntitySystem, i);
@@ -84,5 +78,5 @@ void SetPostDataUpdateId(const uintptr_t CGameEntitySystem, const uint32_t index
     const uintptr_t clientEntList = mem->Read<uintptr_t>(CGameEntitySystem + Offsets::m_pClientEntList);
 
     mem->Write<uint32_t>(clientEntList + (index * sizeof(ClientEnt)) + offsetof(ClientEnt, PostDataUpdateId), newPostDataUpdateId);
-    mem->Write<uint32_t>(clientEntList + (index * sizeof(ClientEnt)) + offsetof(ClientEnt, pad_000C), 3212836864);
+    //mem->Write<uint32_t>(clientEntList + (index * sizeof(ClientEnt)) + offsetof(ClientEnt, pad_000C), 3212836864);
 }

@@ -14,6 +14,8 @@
 #include <fstream>
 #include <filesystem>
 
+#include "../src/SDK/weapon/weapon.h"
+
 #pragma comment(lib, "winhttp.lib")
 #pragma comment(lib, "shell32.lib")
 

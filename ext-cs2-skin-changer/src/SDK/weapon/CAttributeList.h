@@ -1,4 +1,5 @@
 #include "../../../ext/mem.h"
+#include "../../../ext/skindb.h"
 
 //class CEconItemAttribute
 //{
@@ -57,55 +58,29 @@ inline CEconItemAttribute GetAttributeByIndex(const uintptr_t pAttributeArray, c
 std::vector<CEconItemAttribute> GetAttributes(const uintptr_t pItem)
 {
 	const CAttribute attribute = mem->Read<CAttribute>(pItem + Offsets::m_AttributeList + Offsets::m_Attributes);
-	const uintptr_t pAttributeArray = attribute.pAttributes;
-	//std::cout << std::dec << "Attribute Size: " << attribute << std::endl;
+	if(!attribute.pAttributes)
+		return {};
 
 	std::vector<CEconItemAttribute> attributes;
 	for (uint16_t i = 0; i < attribute.uSize; i++)
-	{
-		attributes.push_back(GetAttributeByIndex(pAttributeArray, i));
-	}
+		attributes.push_back(GetAttributeByIndex(attribute.pAttributes, i));
+
 	return attributes;
 }
 
-bool IsAttributeUpdated(const uintptr_t pItem, const AttributeDefinitionIndex attributeDef, float value)
+bool AttributesUpdated(const uintptr_t pWeapon)
 {
-	std::vector<CEconItemAttribute> attributes = GetAttributes(pItem);
+	const uintptr_t item = pWeapon + Offsets::m_AttributeManager + Offsets::m_Item;
+	SkinInfo_t Skin = skinManager->GetSkin(static_cast<WeaponsEnum>(mem->Read<uint16_t>(item + Offsets::m_iItemDefinitionIndex)));
+	std::vector<CEconItemAttribute> attributes = GetAttributes(item);
+	if (!Skin.Paint || attributes.empty())
+		return false;
 
 	for (const CEconItemAttribute attribute : attributes)
 	{
-		if(attribute.attributeDefinitionIndex != attributeDef)
-			continue;
-		
-		return attribute.value == value;
+		if (attribute.attributeDefinitionIndex == AttributeDefinitionIndex::Paint)
+			return mem->Read<int32_t>(pWeapon + Offsets::m_nFallbackPaintKit) == Skin.Paint;
 	}
 
 	return false;
-}
-
-bool AreWeaponFallbackValuesUpdated(const uintptr_t& weapon)
-{
-	const uintptr_t item = weapon + Offsets::m_AttributeManager + Offsets::m_Item;
-	std::vector<CEconItemAttribute> attributes = GetAttributes(item);
-
-	for (const CEconItemAttribute attribute : attributes)
-	{
-		switch (attribute.attributeDefinitionIndex)
-		{
-		case AttributeDefinitionIndex::Paint:
-			if (attribute.value != (float)mem->Read<uint32_t>(weapon + Offsets::m_nFallbackPaintKit))
-				return false;
-		case AttributeDefinitionIndex::Pattern:
-			if (attribute.value != (float)mem->Read<uint32_t>(weapon + Offsets::m_nFallbackSeed))
-				return false;
-		case AttributeDefinitionIndex::Wear:
-			if (attribute.value != mem->Read<float>(weapon + Offsets::m_flFallbackWear))
-				return false;
-		case AttributeDefinitionIndex::StatTrack:
-			if (attribute.value != (float)mem->Read<uint32_t>(weapon + Offsets::m_nFallbackStatTrak))
-				return false;
-		}
-	}
-
-	return true;
 }

@@ -37,6 +37,7 @@ namespace Offsets
 
     constexpr std::ptrdiff_t m_nSubclassID = cs2_dumper::schemas::client_dll::C_BaseEntity::m_nSubclassID; // uint64
     constexpr std::ptrdiff_t m_bMeleeWeapon = cs2_dumper::schemas::client_dll::CCSWeaponBaseVData::m_bMeleeWeapon; // uint64
+    constexpr std::ptrdiff_t m_WeaponType = cs2_dumper::schemas::client_dll::CCSWeaponBaseVData::m_WeaponType; // CSWeaponType
 
     constexpr std::ptrdiff_t m_nFallbackPaintKit = cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackPaintKit; // uint32
     constexpr std::ptrdiff_t m_nFallbackStatTrak = cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackStatTrak; // uint32
