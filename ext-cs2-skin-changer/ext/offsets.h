@@ -1,7 +1,10 @@
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+
 #include "a2x/client_dll.hpp"
 #include "a2x/offsets.hpp"
-
-#pragma once
 
 namespace Offsets
 {

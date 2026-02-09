@@ -1,8 +1,12 @@
-﻿#include <iostream>
+﻿#pragma once
+
+#include <iostream>
 #include <string>
 #include <vector>
-#include <curl/curl.h>
-#include <nlohmann/json.hpp>
+#include <map>
+#include <unordered_map>
+#include "../curl/curl.h"
+#include "json.hpp"
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -19,8 +23,6 @@
 
 #pragma comment(lib, "winhttp.lib")
 #pragma comment(lib, "shell32.lib")
-
-#pragma once
 
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
@@ -263,6 +265,8 @@ public:
         if (!curl) return;
 
         std::string readBuffer;
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins.json");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Windows.h>
 #include <dwmapi.h>
 #include <d3d11.h>
@@ -9,8 +11,6 @@
 #include "../../ext/ImGui 1.90/imgui.h"
 #include "../../ext/ImGui 1.90/imgui_impl_win32.h"
 #include "../../ext/ImGui 1.90/imgui_impl_dx11.h"
-
-#pragma once
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dwmapi.lib")

@@ -1,6 +1,6 @@
-#include "../../../ext/mem.h"
-
 #pragma once
+
+#include "../../../ext/mem.h"
 
 const uintptr_t client = mem.GetModuleBase(L"client.dll");
 static const uintptr_t entitylist = mem.Read<uintptr_t>(client + Offsets::dwEntityList);
