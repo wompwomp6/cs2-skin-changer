@@ -1,8 +1,8 @@
+#pragma once
+
 #include <iostream>
 
 #include "mem.h"
-
-#pragma once
 
 namespace Sigs
 {

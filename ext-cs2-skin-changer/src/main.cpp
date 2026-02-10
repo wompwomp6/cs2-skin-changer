@@ -106,6 +106,7 @@ int main()
             UpdateWeapons(weapons);
 
         ForceUpdate = false;
+        ForceLoadSkinConfig = false;
     }
     
     return 0;

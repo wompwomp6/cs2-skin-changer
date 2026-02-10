@@ -143,6 +143,18 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="curl\curl.h" />
+    <ClInclude Include="curl\curlver.h" />
+    <ClInclude Include="curl\easy.h" />
+    <ClInclude Include="curl\header.h" />
+    <ClInclude Include="curl\mprintf.h" />
+    <ClInclude Include="curl\multi.h" />
+    <ClInclude Include="curl\options.h" />
+    <ClInclude Include="curl\stdcheaders.h" />
+    <ClInclude Include="curl\system.h" />
+    <ClInclude Include="curl\typecheck-gcc.h" />
+    <ClInclude Include="curl\urlapi.h" />
+    <ClInclude Include="curl\websockets.h" />
     <ClInclude Include="ext\a2x\client_dll.hpp" />
     <ClInclude Include="ext\a2x\offsets.hpp" />
     <ClInclude Include="ext\ImGui 1.90\imconfig.h" />
@@ -153,11 +165,13 @@
     <ClInclude Include="ext\ImGui 1.90\imstb_rectpack.h" />
     <ClInclude Include="ext\ImGui 1.90\imstb_textedit.h" />
     <ClInclude Include="ext\ImGui 1.90\imstb_truetype.h" />
+    <ClInclude Include="ext\json.hpp" />
     <ClInclude Include="ext\json\include\json.hpp" />
     <ClInclude Include="ext\mem.h" />
     <ClInclude Include="ext\offsets.h" />
     <ClInclude Include="ext\sigs.h" />
     <ClInclude Include="ext\skindb.h" />
+    <ClInclude Include="src\config.h" />
     <ClInclude Include="src\menu.h" />
     <ClInclude Include="src\SDK\CEconItemAttributeManager.h" />
     <ClInclude Include="src\SDK\entity\CWeaponServices.h" />
@@ -170,6 +184,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\libbrotlicommon.a" />
+    <Library Include="lib\libbrotlidec.a" />
+    <Library Include="lib\libcrypto.a" />
+    <Library Include="lib\libcurl.a" />
+    <Library Include="lib\libcurl.dll.a" />
+    <Library Include="lib\libnghttp2.a" />
+    <Library Include="lib\libnghttp3.a" />
+    <Library Include="lib\libngtcp2.a" />
+    <Library Include="lib\libngtcp2_crypto_libressl.a" />
+    <Library Include="lib\libpsl.a" />
+    <Library Include="lib\libssh2.a" />
+    <Library Include="lib\libssl.a" />
+    <Library Include="lib\libz.a" />
+    <Library Include="lib\libzstd.a" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Windows.h>
 #include <dwmapi.h>
 #include <d3d11.h>
@@ -9,8 +11,6 @@
 #include "../../ext/ImGui 1.90/imgui.h"
 #include "../../ext/ImGui 1.90/imgui_impl_win32.h"
 #include "../../ext/ImGui 1.90/imgui_impl_dx11.h"
-
-#pragma once
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dwmapi.lib")
@@ -32,7 +32,7 @@ namespace overlay {
     inline int G_Width = GetSystemMetrics(SM_CXSCREEN);
     inline int G_Height = GetSystemMetrics(SM_CYSCREEN);
 
-    inline int desired_fps = 120;
+    inline int desired_fps = 400;
 
     void CreateRenderTarget() {
         ID3D11Texture2D* pBackBuffer = nullptr;
@@ -222,8 +222,133 @@ namespace overlay {
         POINT p;
         GetCursorPos(&p);
         ImGuiIO& io = ImGui::GetIO();
-        io.MousePos = ImVec2((float)p.x, (float)p.y);
-        io.MouseDown[0] = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+        POINT pos;
+        if (GetCursorPos(&pos) && ScreenToClient(overlay::Window, &pos)) {
+            io.AddMousePosEvent((float)pos.x, (float)pos.y);
+        }
+        io.AddMouseButtonEvent(0, (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0);
+        io.AddMouseButtonEvent(1, (GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0);
+        io.AddMouseButtonEvent(2, (GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0);
+
+        // 2. Keyboard Mapping Helper
+        auto update_key = [&](ImGuiKey key, int vkey) {
+            io.AddKeyEvent(key, (GetAsyncKeyState(vkey) & 0x8000) != 0);
+            };
+
+        // Letters
+        for (int i = 0; i < 26; i++)
+            update_key((ImGuiKey)(ImGuiKey_A + i), 'A' + i);
+
+        // Numbers
+        for (int i = 0; i < 10; i++)
+            update_key((ImGuiKey)(ImGuiKey_0 + i), '0' + i);
+
+        // Numpad
+        for (int i = 0; i < 10; i++)
+            update_key((ImGuiKey)(ImGuiKey_Keypad0 + i), VK_NUMPAD0 + i);
+
+        // Function keys
+        for (int i = 0; i < 12; i++)
+            update_key((ImGuiKey)(ImGuiKey_F1 + i), VK_F1 + i);
+
+        // Navigation & Control
+        update_key(ImGuiKey_LeftArrow, VK_LEFT);
+        update_key(ImGuiKey_RightArrow, VK_RIGHT);
+        update_key(ImGuiKey_UpArrow, VK_UP);
+        update_key(ImGuiKey_DownArrow, VK_DOWN);
+        update_key(ImGuiKey_PageUp, VK_PRIOR);
+        update_key(ImGuiKey_PageDown, VK_NEXT);
+        update_key(ImGuiKey_Home, VK_HOME);
+        update_key(ImGuiKey_End, VK_END);
+        update_key(ImGuiKey_Insert, VK_INSERT);
+        update_key(ImGuiKey_Delete, VK_DELETE);
+        update_key(ImGuiKey_Backspace, VK_BACK);
+        update_key(ImGuiKey_Space, VK_SPACE);
+        update_key(ImGuiKey_Enter, VK_RETURN);
+        update_key(ImGuiKey_Escape, VK_ESCAPE);
+        update_key(ImGuiKey_Tab, VK_TAB);
+
+        // Modifiers
+        update_key(ImGuiKey_LeftCtrl, VK_CONTROL);
+        update_key(ImGuiKey_LeftShift, VK_SHIFT);
+        update_key(ImGuiKey_LeftAlt, VK_MENU);
+        update_key(ImGuiKey_LeftSuper, VK_LWIN);
+        update_key(ImGuiKey_RightCtrl, VK_RCONTROL);
+        update_key(ImGuiKey_RightShift, VK_RSHIFT);
+
+        // Locks & others
+        update_key(ImGuiKey_CapsLock, VK_CAPITAL);
+        update_key(ImGuiKey_ScrollLock, VK_SCROLL);
+        update_key(ImGuiKey_NumLock, VK_NUMLOCK);
+        update_key(ImGuiKey_PrintScreen, VK_SNAPSHOT);
+        update_key(ImGuiKey_Pause, VK_PAUSE);
+
+        // 3. Character Input
+        bool shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+        bool caps = (GetKeyState(VK_CAPITAL) & 0x0001) != 0;
+
+        // Static map to track previously pressed keys
+        static bool key_down[256] = { false };
+
+        // Letters A-Z
+        for (int i = 'A'; i <= 'Z'; i++) {
+            bool pressed = (GetAsyncKeyState(i) & 0x8000) != 0;
+
+            if (pressed && !key_down[i]) { // Key just pressed
+                char c = (char)i;
+                if ((shift && !caps) || (!shift && caps))
+                    c = toupper(c);
+                else
+                    c = tolower(c);
+
+                io.AddInputCharacter((unsigned int)c);
+            }
+
+            key_down[i] = pressed; // Update state
+        }
+
+        // Numbers + shift symbols
+        struct NumShift { int vkey; char normal; char shifted; };
+        NumShift numbers[] = {
+            { '0', '0', ')' }, { '1', '1', '!' }, { '2', '2', '@' },
+            { '3', '3', '#' }, { '4', '4', '$' }, { '5', '5', '%' },
+            { '6', '6', '^' }, { '7', '7', '&' }, { '8', '8', '*' },
+            { '9', '9', '(' }
+        };
+        for (auto& n : numbers) {
+            bool pressed = (GetAsyncKeyState(n.vkey) & 0x8000) != 0;
+            if (pressed && !key_down[n.vkey]) io.AddInputCharacter(shift ? n.shifted : n.normal);
+            key_down[n.vkey] = pressed;
+        }
+
+        // Symbols
+        struct Symbol { int vkey; char normal; char shifted; };
+        Symbol symbols[] = {
+            { VK_OEM_MINUS, '-', '_' },
+            { VK_OEM_PLUS, '=', '+' },
+            { VK_OEM_1, ';', ':' },
+            { VK_OEM_2, '/', '?' },
+            { VK_OEM_3, '`', '~' },
+            { VK_OEM_4, '[', '{' },
+            { VK_OEM_5, '\\', '|' },
+            { VK_OEM_6, ']', '}' },
+            { VK_OEM_7, '\'', '"' },
+            { VK_OEM_COMMA, ',', '<' },
+            { VK_OEM_PERIOD, '.', '>' }
+        };
+        for (auto& s : symbols) {
+            bool pressed = (GetAsyncKeyState(s.vkey) & 0x8000) != 0;
+            if (pressed && !key_down[s.vkey]) io.AddInputCharacter(shift ? s.shifted : s.normal);
+            key_down[s.vkey] = pressed;
+        }
+
+        // Numpad numbers
+        for (int i = 0; i <= 9; i++) {
+            int vkey = VK_NUMPAD0 + i;
+            bool pressed = (GetAsyncKeyState(vkey) & 0x8000) != 0;
+            if (pressed && !key_down[vkey]) io.AddInputCharacter('0' + i);
+            key_down[vkey] = pressed;
+        }
         io.DeltaTime = 1.0f / 60.0f;
 
         ImGui_ImplDX11_NewFrame();

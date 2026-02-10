@@ -16,7 +16,8 @@ enum ItemIds
 {
     NoSkinValues = 0,
     UseFallBackValues = -1,
-};
+}; 
+
 enum WeaponsEnum : uint16_t
 {
     none = 0,
@@ -48,7 +49,7 @@ enum WeaponsEnum : uint16_t
     Scar20 = 38,
     Sg556 = 39,
     Ssg08 = 40,
-    CtKnife = 42,
+    CtKnife = 42,          // kept
     FlashBang = 43,
     HeGrenade = 44,
     SmokeGrenade = 45,
@@ -59,12 +60,27 @@ enum WeaponsEnum : uint16_t
     M4A4 = 16,
     UspS = 61,
     M4A1Silencer = 60,
-    Cz65A = 63,
+    Cz75A = 63,
     Revolver = 64,
-    Tknife = 59,
+    Tknife = 59,           // kept
     Galil = 13,
-    Mp5SD = 23
+    Mp5SD = 23,
+
+    // ===== added (map weapons, non-knife) =====
+    Shield = 37,
+    Healthshot = 57,
+    TagGrenade = 68,
+    Fists = 69,
+    BreachCharge = 70,
+    Tablet = 72,
+    Melee = 74,
+    Axe = 75,
+    Hammer = 76,
+    Spanner = 78,
+    Snowball = 84,
+    BumpMine = 85
 };
+
 enum class CSWeaponType : uint32_t
 {
     WEAPONTYPE_KNIFE = 0x0,
@@ -100,7 +116,7 @@ CSWeaponType WeaponEnumToType(WeaponsEnum weapon)
     case P200:
     case p250:
     case UspS:
-    case Cz65A:
+    case Cz75A:
     case Revolver:
         return CSWeaponType::WEAPONTYPE_PISTOL;
 
