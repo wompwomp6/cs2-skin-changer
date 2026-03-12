@@ -113,8 +113,66 @@
     <ClInclude Include="src\SDK\musicKits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="curl\curl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\curlver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\easy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\mprintf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\multi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\stdcheaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\typecheck-gcc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\urlapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="curl\websockets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\libbrotlicommon.a" />
+    <Library Include="lib\libbrotlidec.a" />
+    <Library Include="lib\libcrypto.a" />
+    <Library Include="lib\libcurl.a" />
+    <Library Include="lib\libcurl.dll.a" />
+    <Library Include="lib\libnghttp2.a" />
+    <Library Include="lib\libnghttp3.a" />
+    <Library Include="lib\libngtcp2.a" />
+    <Library Include="lib\libngtcp2_crypto_libressl.a" />
+    <Library Include="lib\libpsl.a" />
+    <Library Include="lib\libssh2.a" />
+    <Library Include="lib\libssl.a" />
+    <Library Include="lib\libz.a" />
+    <Library Include="lib\libzstd.a" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,12 @@
-﻿#include <iostream>
+﻿#pragma once
+
+#include <iostream>
 #include <string>
 #include <vector>
-#include <curl/curl.h>
-#include <nlohmann/json.hpp>
+#include <map>
+#include <unordered_map>
+#include "../curl/curl.h"
+#include "json.hpp"
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -19,8 +23,6 @@
 
 #pragma comment(lib, "winhttp.lib")
 #pragma comment(lib, "shell32.lib")
-
-#pragma once
 
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
@@ -100,9 +102,13 @@ std::vector<Knife_t> Knifes = {
 
 struct SkinInfo_t {
     int Paint;
-    bool bUsesOldModel;
-    std::string name;
-    WeaponsEnum weaponType;
+    int temp_pattern = 0;
+    int pattern = 0;
+    float wear = 0.01f;
+    bool bUsesOldModel = false;
+    bool loaded = false;
+    std::string name = "";
+    WeaponsEnum weaponType = WeaponsEnum::none;
 };
 
 struct Glove_t
@@ -112,56 +118,7 @@ struct Glove_t
 };
 
 bool ForceUpdate = false;
-class SkinManager
-{
-public:
-    std::vector<SkinInfo_t> Skins;
-    Glove_t Gloves = Glove_t();
-    Knife_t Knife = Knife_t();
-    MusicKit_t MusicKit = MusicKit_t(static_cast<uint16_t>(MusicKit::CounterStrike2), "Counter-Strike 2");
-
-    void AddSkin(SkinInfo_t AddedSkin)
-    {
-        for (SkinInfo_t& skin : Skins)
-        {
-            if (skin.weaponType == AddedSkin.weaponType)
-            {
-                if (skin.Paint == AddedSkin.Paint)
-                    return;
-
-                skin = AddedSkin;
-                ForceUpdate = true;
-                return;
-            }    
-        }
-
-        Skins.push_back(AddedSkin);
-        ForceUpdate = true;
-    }
-
-    SkinInfo_t GetSkin(const WeaponsEnum def)
-    {
-        for (const SkinInfo_t& skin : Skins)
-            if (skin.weaponType == def)
-                return skin;
-        return SkinInfo_t{0, false, std::string(), WeaponsEnum::none};
-    }
-
-    uint16_t GetSkinIndexFromArray(std::vector<SkinInfo_t> WeaponSkins, SkinInfo_t SelectedSkin)
-    {
-        for (int i = 0; i < WeaponSkins.size(); i++)
-        {
-            if(WeaponSkins[i].Paint == SelectedSkin.Paint)
-				return i;
-        }
-
-		return 0;
-    }
-
-    //void PharseJson(//file path here);
-	//void ExportJson(//file path here);
-};
-SkinManager* skinManager = new SkinManager();
+bool ForceLoadSkinConfig = false;
 
 class CSkinDB {
 private:
@@ -197,9 +154,9 @@ private:
     };
 
     std::vector<std::string> gloveTypes = {
-        "Bloodhound Gloves", "Broken Fang Gloves", 
-        "Driver Gloves", "Hand Wraps", 
-        "Hydra Gloves", "Moto Gloves", 
+        "Bloodhound Gloves", "Broken Fang Gloves",
+        "Driver Gloves", "Hand Wraps",
+        "Hydra Gloves", "Moto Gloves",
         "Specialist Gloves", "Sport Gloves"
     };
 
@@ -210,7 +167,7 @@ private:
             {"AUG", WeaponsEnum::Aug},
             {"AWP", WeaponsEnum::Awp},
             {"PP-Bizon", WeaponsEnum::Bizon},
-            {"PP-CZ75-Auto", WeaponsEnum::Cz65A},
+            {"PP-CZ75-Auto", WeaponsEnum::Cz75A},
             {"Desert Eagle", WeaponsEnum::Deagle},
             {"Dual Berettas", WeaponsEnum::Elite},
             {"FAMAS", WeaponsEnum::Famas},
@@ -257,12 +214,14 @@ private:
     }
 
 public:
-    void DumpSkindb() 
+    void DumpSkindb()
     {
         CURL* curl = curl_easy_init();
         if (!curl) return;
 
         std::string readBuffer;
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(curl, CURLOPT_URL, "https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins.json");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
@@ -283,13 +242,15 @@ public:
                 SkinInfo_t info;
                 info.Paint = GetPaintIndexSafe(skin);
                 info.name = GetStringSafe(skin, "name");
-                info.weaponType = GetDefPerString(info.name);
+                info.weaponType = (WeaponsEnum)skin["weapon"].value("weapon_id", 0);
 
                 if (skin.contains("legacy_model") && skin["legacy_model"].is_boolean()) {
                     info.bUsesOldModel = skin["legacy_model"].get<bool>();
                 }
 
                 std::string weaponType = GetStringSafe(skin, "weapon");
+                std::cout << weaponType << "\n";
+
                 bool isKnife = false;
                 bool isGlove = false;
 
@@ -315,44 +276,122 @@ public:
                     //gloveSkins.push_back(info);
                     continue;
                 }
-                weaponSkins.push_back(info);     
+                weaponSkins.push_back(info);
             }
         }
         catch (const std::exception& e) {
             std::cerr << "JSON parse error: " << e.what() << std::endl;
         }
 
-		std::cout << "Skindb dumped" << std::endl;
+        std::cout << "Skindb dumped" << std::endl;
     }
 
     void DumpSkinEconImages()
     {
 
         return;
-        
-		std::cout << "Econ images dumped" << std::endl;
+
+        std::cout << "Econ images dumped" << std::endl;
     }
 
     inline void Dump() { DumpSkindb(); DumpSkinEconImages(); }
 
-    std::vector<SkinInfo_t> GetWeaponSkins(WeaponsEnum type = WeaponsEnum::none)
-    {
-        std::vector<SkinInfo_t> results;
+    std::map<WeaponsEnum, std::vector<SkinInfo_t>> skinSettings;
+    std::map<WeaponsEnum, int> skinApplied;
 
-        results.push_back(SkinInfo_t{ 0, false, "Vanila", WeaponsEnum::none });
+    std::vector<SkinInfo_t>& GetWeaponSkins(WeaponsEnum type = WeaponsEnum::none)
+    {
+        std::vector<SkinInfo_t>& results = skinSettings[type];
+
+        if (results.empty()) {
+            SkinInfo_t si;
+            si.name = "Vanila";
+
+            results.push_back(si);
+        }
 
         if (type == WeaponsEnum::none)
             return results;
 
-        for (const auto& skin : weaponSkins)
-        {
-            if (skin.weaponType != type)
-                continue;
+        if (results.size() == 1) {
+            for (const auto& skin : weaponSkins)
+            {
+                if (skin.weaponType != type)
+                    continue;
 
-            results.push_back(skin);
+                results.push_back(skin);
+            }
         }
-
         return results;
     }
 };
 CSkinDB* skindb = new CSkinDB();
+
+class SkinManager
+{
+public:
+    std::vector<SkinInfo_t> Skins;
+    Glove_t Gloves = Glove_t();
+    Knife_t Knife = Knife_t();
+    MusicKit_t MusicKit = MusicKit_t(static_cast<uint16_t>(MusicKit::CounterStrike2), "Counter-Strike 2");
+
+    void AddSkin(SkinInfo_t AddedSkin)
+    {
+        for (SkinInfo_t& skin : Skins)
+        {
+            if (skin.weaponType == AddedSkin.weaponType)
+            {
+                if (skin.Paint == AddedSkin.Paint && skin.wear == AddedSkin.wear && skin.pattern == AddedSkin.pattern)
+                    return;
+
+                skin = AddedSkin;
+                ForceUpdate = true;
+                return;
+            }    
+        }
+
+        Skins.push_back(AddedSkin);
+        ForceUpdate = true;
+    }
+
+    SkinInfo_t GetSkin(const WeaponsEnum def)
+    {
+        for (auto& [weapon, pk] : skindb->skinApplied) {
+            if (def == weapon) {
+                SkinInfo_t found_skin;
+                found_skin.Paint = pk;
+
+                std::vector<SkinInfo_t>& vector = skindb->skinSettings[def];
+
+                for (SkinInfo_t& si : vector) {
+                    if (si.Paint == pk)
+                    {
+                        return si;
+                    }
+                }
+            }
+        }
+
+        for (const SkinInfo_t& skin : Skins)
+           if (skin.weaponType == def)
+             return skin;
+
+        return SkinInfo_t();
+    }
+
+    uint16_t GetSkinIndexFromArray(std::vector<SkinInfo_t> WeaponSkins, SkinInfo_t SelectedSkin)
+    {
+        for (int i = 0; i < WeaponSkins.size(); i++)
+        {
+            if (WeaponSkins[i].Paint == SelectedSkin.Paint) {
+                return i;
+            }
+        }
+
+		return 0;
+    }
+
+    //void PharseJson(//file path here);
+	//void ExportJson(//file path here);
+};
+SkinManager* skinManager = new SkinManager();

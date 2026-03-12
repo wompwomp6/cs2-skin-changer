@@ -64,9 +64,23 @@ public:
 
 		if (skin.Paint)
 		{
+			float wear = 0.1f;
+			int pattern = 0;
+
+			std::vector<SkinInfo_t>& settings = skindb->skinSettings[skin.weaponType];
+			for (SkinInfo_t& setting : settings) {
+				if (setting.Paint == skin.Paint) {
+					wear = setting.wear;
+					pattern = setting.pattern;
+				}
+			}
+
 			attributes.push_back(Make(ItemAttributeDefinitions::Paint, skin.Paint));
-			attributes.push_back(Make(ItemAttributeDefinitions::Pattern, 0));
-			attributes.push_back(Make(ItemAttributeDefinitions::Wear, 0.01f));
+			attributes.push_back(Make(ItemAttributeDefinitions::Pattern, pattern));
+			attributes.push_back(Make(ItemAttributeDefinitions::Wear, wear));
+
+			int& pk = skindb->skinApplied[skin.weaponType];
+			pk = skin.Paint;
 		}
 			
 		//if (skin.pattern)
